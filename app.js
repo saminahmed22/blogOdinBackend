@@ -4,13 +4,16 @@ import "dotenv/config";
 import express from "express";
 const app = express();
 
-// Routes
-import { profileRouter } from "./routers/profileRouter.js";
-import { postRouter } from "./routers/postRouter.js";
-import { commentRouter } from "./routers/commentRouter.js";
-import { adminRouter } from "./routers/adminRouter.js";
+// Parsing texts
+app.use(express.urlencoded({ extended: true }));
 
-app.use("/profile", profileRouter);
+// Routes
+import { userRouter } from "./routers/userRouter.js";
+import { postRouter } from "./ForLater/postRouter.js";
+import { commentRouter } from "./ForLater/commentRouter.js";
+import { adminRouter } from "./ForLater/adminRouter.js";
+
+app.use("/user", userRouter);
 app.use("/post", postRouter);
 app.use("/comment", commentRouter);
 app.use("/admin", adminRouter);
