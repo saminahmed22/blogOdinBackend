@@ -6,7 +6,27 @@ import {
   deletePostDB,
 } from "../models/postModel.js";
 
-export async function getPost(req, res, next) {}
+export async function getPost(req, res, next) {
+  const postID = req.params.id;
+  const post = await getPostDB(postID);
+
+  if (post instanceof Error) {
+    const errorCode = post.message;
+
+    let statusCode, errorMessage;
+
+    switch (errorCode) {
+      default:
+        statusCode = 500;
+        errorMessage = "Unknown error.";
+        break;
+    }
+
+    res.status(statusCode).json({ error: errorMessage, code: errorCode });
+  } else {
+    res.json(post);
+  }
+}
 
 export async function createPost(req, res, next) {
   const data = {
