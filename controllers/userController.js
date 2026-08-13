@@ -28,9 +28,21 @@ export async function createUser(req, res, next) {
   if (user instanceof Error) {
     const errorCode = user.message;
 
-    res
-      .status(409)
-      .json({ error: "This username is unavailbale.", code: user.message });
+    let statusCode, errorMessage;
+
+    switch (errorCode) {
+      case "P2002":
+        statusCode = 409;
+        errorMessage = "This username is unavailbale.";
+        break;
+
+      default:
+        statusCode = 500;
+        errorMessage = "Unknown error.";
+        break;
+    }
+
+    res.status(statusCode).json({ error: errorMessage, code: errorCode });
   } else {
     res.json(user);
   }
