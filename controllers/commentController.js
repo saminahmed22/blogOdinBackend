@@ -1,0 +1,40 @@
+// Modles
+import {
+  getCommentDB,
+  createCommentDB,
+  editCommentDB,
+  deleteCommentDB,
+} from "../models/commentModel.js";
+
+export async function getComment(req, res, next) {}
+
+export async function createComment(req, res, next) {
+  const data = {
+    content: req?.body?.content,
+    postId: "3ID7uV_Dpo",
+    authorId: "019ffbc2-7319-71da-83f3-b271f6a40e7e",
+  };
+
+  const comment = await createCommentDB(data);
+
+  if (comment instanceof Error) {
+    const errorCode = comment.message;
+
+    let statusCode, errorMessage;
+
+    switch (errorCode) {
+      default:
+        statusCode = 500;
+        errorMessage = "Unknown error.";
+        break;
+    }
+
+    res.status(statusCode).json({ error: errorMessage, code: errorCode });
+  } else {
+    res.json(comment);
+  }
+}
+
+export async function editComment(req, res, next) {}
+
+export async function deleteComment(req, res, next) {}
