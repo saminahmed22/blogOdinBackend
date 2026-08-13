@@ -27,4 +27,10 @@ export async function editUserDB(data) {
 
   return { user };
 }
+
+export async function deleteUserDB(userID) {
+  const user = await prisma.user.delete({ where: { id: userID } });
+
+  return { Deleted: { user } };
+}
 //#endregion
