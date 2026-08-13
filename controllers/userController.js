@@ -64,7 +64,7 @@ export async function createUser(req, res, next) {
 
 export async function editUser(req, res, next) {
   const data = {
-    id: "019ffba7-8ebd-74c3-a07a-72a145fc66c0",
+    id: "019ffbc2-7319-71da-83f3-b271f6a40e7e",
     firstName: req?.body?.firstName,
     lastName: req?.body?.lastName,
     username: req?.body?.username,
