@@ -14,6 +14,19 @@ export async function createCommentDB(data) {
   }
 }
 
-export async function editCommentDB(data) {}
+export async function editCommentDB(data) {
+  try {
+    const comment = await prisma.comment.update({
+      data,
+      where: { id: data.id, postId: data.postId, authorId: data.authorId },
+    });
+
+    return { comment };
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
 
 export async function deleteCommentDB(commentID) {}
