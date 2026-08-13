@@ -39,4 +39,15 @@ export async function editPostDB(data) {
   }
 }
 
-export async function deletePostDB(postID) {}
+export async function deletePostDB(postID) {
+  try {
+    // TODO: Add author ID check
+    const post = await prisma.post.delete({ where: { id: postID } });
+
+    return { Deleted: { post } };
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}

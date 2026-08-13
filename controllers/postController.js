@@ -83,4 +83,24 @@ export async function editPost(req, res, next) {
   }
 }
 
-export async function deletePost(req, res, next) {}
+export async function deletePost(req, res, next) {
+  const postID = req.params.id;
+  const post = await deletePostDB(postID);
+
+  if (post instanceof Error) {
+    const errorCode = post.message;
+
+    let statusCode, errorMessage;
+
+    switch (errorCode) {
+      default:
+        statusCode = 500;
+        errorMessage = "Unknown error.";
+        break;
+    }
+
+    res.status(statusCode).json({ error: errorMessage, code: errorCode });
+  } else {
+    res.json(post);
+  }
+}
