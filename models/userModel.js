@@ -18,4 +18,13 @@ export async function createUserDB(data) {
     return new Error(errorCode);
   }
 }
+
+export async function editUserDB(data) {
+  const user = await prisma.user.update({
+    data,
+    where: { id: data.id },
+  });
+
+  return { user };
+}
 //#endregion
