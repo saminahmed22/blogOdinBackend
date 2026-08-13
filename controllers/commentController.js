@@ -83,4 +83,24 @@ export async function editComment(req, res, next) {
   }
 }
 
-export async function deleteComment(req, res, next) {}
+export async function deleteComment(req, res, next) {
+  const commentID = req.params.id;
+  const comment = await deleteCommentDB(commentID);
+
+  if (comment instanceof Error) {
+    const errorCode = comment.message;
+
+    let statusCode, errorMessage;
+
+    switch (errorCode) {
+      default:
+        statusCode = 500;
+        errorMessage = "Unknown error.";
+        break;
+    }
+
+    res.status(statusCode).json({ error: errorMessage, code: errorCode });
+  } else {
+    res.json(comment);
+  }
+}

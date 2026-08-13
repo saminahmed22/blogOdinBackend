@@ -41,4 +41,15 @@ export async function editCommentDB(data) {
   }
 }
 
-export async function deleteCommentDB(commentID) {}
+export async function deleteCommentDB(commentID) {
+  try {
+    // TODO: Add author ID check
+    const comment = await prisma.comment.delete({ where: { id: commentID } });
+
+    return { Deleted: { comment } };
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
