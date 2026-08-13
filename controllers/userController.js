@@ -50,4 +50,11 @@ export async function editUser(req, res, next) {
 
   res.json(user);
 }
+
+export async function deleteUser(req, res, next) {
+  const userID = req.params.id;
+  const user = await deleteUserDB(userID);
+
+  res.json(user);
+}
 //#endregion
