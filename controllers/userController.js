@@ -16,11 +16,6 @@ export async function getUser(req, res, next) {
     let statusCode, errorMessage;
 
     switch (errorCode) {
-      case "P2002":
-        statusCode = 409;
-        errorMessage = "This username is unavailable.";
-        break;
-
       default:
         statusCode = 500;
         errorMessage = "Unknown error.";
@@ -85,11 +80,6 @@ export async function editUser(req, res, next) {
     let statusCode, errorMessage;
 
     switch (errorCode) {
-      case "P2002":
-        statusCode = 409;
-        errorMessage = "This username is unavailable.";
-        break;
-
       default:
         statusCode = 500;
         errorMessage = "Unknown error.";
@@ -112,11 +102,6 @@ export async function deleteUser(req, res, next) {
     let statusCode, errorMessage;
 
     switch (errorCode) {
-      case "P2002":
-        statusCode = 409;
-        errorMessage = "This username is unavailable.";
-        break;
-
       default:
         statusCode = 500;
         errorMessage = "Unknown error.";
