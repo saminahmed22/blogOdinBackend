@@ -1,0 +1,37 @@
+{
+  "name": "blogodinbackend",
+  "version": "1.0.0",
+  "description": "Repository for BlogOdin Backend",
+  "keywords": [
+    "BlogOdin",
+    "blog"
+  ],
+  "homepage": "https://github.com/saminahmed22/blogOdinBackend#readme",
+  "bugs": {
+    "url": "https://github.com/saminahmed22/blogOdinBackend/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saminahmed22/blogOdinBackend.git"
+  },
+  "license": "MIT",
+  "author": "Samin Ahmed",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "pg": "^8.23.0",
+    "prettier-plugin-ejs": "^1.0.3",
+    "prettier-plugin-prisma": "^5.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.9.1"
+  }
+}
