@@ -24,6 +24,19 @@ export async function createPostDB(data) {
   }
 }
 
-export async function editPostDB(data) {}
+export async function editPostDB(data) {
+  try {
+    const post = await prisma.post.update({
+      data,
+      where: { id: data.id, authorId: data.authorId },
+    });
+
+    return { post };
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
 
 export async function deletePostDB(postID) {}
