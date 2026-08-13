@@ -35,4 +35,19 @@ export async function createUser(req, res, next) {
     res.json(user);
   }
 }
+
+export async function editUser(req, res, next) {
+  const data = {
+    id: "019ffba7-8ebd-74c3-a07a-72a145fc66c0",
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    username: req.body.username,
+    bio: req.body.bio,
+    passwordHash: req.body.passwordHash,
+  };
+
+  const user = await editUserDB(data);
+
+  res.json(user);
+}
 //#endregion
