@@ -7,4 +7,4 @@ import { commentRouter } from "./commentRouter.js";
 
 apiRouter.use("/user", userRouter);
 apiRouter.use("/post", postRouter);
-apiRouter.use("/comment", postRouter);
+apiRouter.use("/comment", commentRouter);
