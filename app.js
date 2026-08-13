@@ -8,18 +8,12 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-import { userRouter } from "./routers/userRouter.js";
-import { postRouter } from "./ForLater/postRouter.js";
-import { commentRouter } from "./ForLater/commentRouter.js";
-import { adminRouter } from "./ForLater/adminRouter.js";
+import { apiRouter } from "./routers/apiRouter.js";
 
-app.use("/user", userRouter);
-app.use("/post", postRouter);
-app.use("/comment", commentRouter);
-app.use("/admin", adminRouter);
+app.use("/api", apiRouter);
 
 app.use("/", (req, res, next) => {
-  return res.send("Hello");
+  return res.json("Hello");
 });
 
 // Listener
