@@ -1,10 +1,15 @@
 import { prisma } from "../lib/prisma.js";
 
-//#region User CURD
 export async function getUserDB(userID) {
-  const user = await prisma.user.findUnique({ where: { id: userID } });
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userID } });
 
-  return user;
+    return user;
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
 }
 
 export async function createUserDB(data) {
@@ -20,17 +25,28 @@ export async function createUserDB(data) {
 }
 
 export async function editUserDB(data) {
-  const user = await prisma.user.update({
-    data,
-    where: { id: data.id },
-  });
+  try {
+    const user = await prisma.user.update({
+      data,
+      where: { id: data.id },
+    });
 
-  return { user };
+    return { user };
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
 }
 
 export async function deleteUserDB(userID) {
-  const user = await prisma.user.delete({ where: { id: userID } });
+  try {
+    const user = await prisma.user.delete({ where: { id: userID } });
 
-  return { Deleted: { user } };
+    return { Deleted: { user } };
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
 }
-//#endregion

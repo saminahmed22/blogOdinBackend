@@ -6,21 +6,40 @@ import {
   deleteUserDB,
 } from "../models/userModel.js";
 
-//#region User CURD
 export async function getUser(req, res, next) {
   const userID = req.params.id;
   const user = await getUserDB(userID);
 
-  res.json(user);
+  if (user instanceof Error) {
+    const errorCode = user.message;
+
+    let statusCode, errorMessage;
+
+    switch (errorCode) {
+      case "P2002":
+        statusCode = 409;
+        errorMessage = "This username is unavailable.";
+        break;
+
+      default:
+        statusCode = 500;
+        errorMessage = "Unknown error.";
+        break;
+    }
+
+    res.status(statusCode).json({ error: errorMessage, code: errorCode });
+  } else {
+    res.json(user);
+  }
 }
 
 export async function createUser(req, res, next) {
   const data = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    username: req.body.username,
-    bio: req.body.bio,
-    passwordHash: req.body.passwordHash,
+    firstName: req?.body?.firstName,
+    lastName: req?.body?.lastName,
+    username: req?.body?.username,
+    bio: req?.body?.bio,
+    passwordHash: req?.body?.passwordHash,
   };
 
   const user = await createUserDB(data);
@@ -33,7 +52,7 @@ export async function createUser(req, res, next) {
     switch (errorCode) {
       case "P2002":
         statusCode = 409;
-        errorMessage = "This username is unavailbale.";
+        errorMessage = "This username is unavailable.";
         break;
 
       default:
@@ -51,22 +70,61 @@ export async function createUser(req, res, next) {
 export async function editUser(req, res, next) {
   const data = {
     id: "019ffba7-8ebd-74c3-a07a-72a145fc66c0",
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    username: req.body.username,
-    bio: req.body.bio,
-    passwordHash: req.body.passwordHash,
+    firstName: req?.body?.firstName,
+    lastName: req?.body?.lastName,
+    username: req?.body?.username,
+    bio: req?.body?.bio,
+    passwordHash: req?.body?.passwordHash,
   };
 
   const user = await editUserDB(data);
 
-  res.json(user);
+  if (user instanceof Error) {
+    const errorCode = user.message;
+
+    let statusCode, errorMessage;
+
+    switch (errorCode) {
+      case "P2002":
+        statusCode = 409;
+        errorMessage = "This username is unavailable.";
+        break;
+
+      default:
+        statusCode = 500;
+        errorMessage = "Unknown error.";
+        break;
+    }
+
+    res.status(statusCode).json({ error: errorMessage, code: errorCode });
+  } else {
+    res.json(user);
+  }
 }
 
 export async function deleteUser(req, res, next) {
   const userID = req.params.id;
   const user = await deleteUserDB(userID);
 
-  res.json(user);
+  if (user instanceof Error) {
+    const errorCode = user.message;
+
+    let statusCode, errorMessage;
+
+    switch (errorCode) {
+      case "P2002":
+        statusCode = 409;
+        errorMessage = "This username is unavailable.";
+        break;
+
+      default:
+        statusCode = 500;
+        errorMessage = "Unknown error.";
+        break;
+    }
+
+    res.status(statusCode).json({ error: errorMessage, code: errorCode });
+  } else {
+    res.json(user);
+  }
 }
-//#endregion
