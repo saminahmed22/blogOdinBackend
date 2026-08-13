@@ -57,7 +57,7 @@ export async function createPost(req, res, next) {
 
 export async function editPost(req, res, next) {
   const data = {
-    id: "mqZaSPf6lL",
+    id: "3ID7uV_Dpo",
     authorId: "019ffbc2-7319-71da-83f3-b271f6a40e7e",
     title: req?.body?.title,
     description: req?.body?.description,
