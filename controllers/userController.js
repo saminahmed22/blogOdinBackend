@@ -6,9 +6,12 @@ import {
   deleteUserDB,
 } from "../models/userModel.js";
 
+// Utils
+import { hashString } from "../utils/crypto.js";
+
 export async function getUser(req, res, next) {
   const userID = req.params.id;
-  const user = await getUserDB(userID);
+  const user = await getUserDB({ id: userID });
 
   if (user instanceof Error) {
     const errorCode = user.message;
@@ -29,12 +32,16 @@ export async function getUser(req, res, next) {
 }
 
 export async function createUser(req, res, next) {
+  const givenPassword = req?.body?.password;
+
+  const hashedPassword = await hashString(givenPassword);
+
   const data = {
     firstName: req?.body?.firstName,
     lastName: req?.body?.lastName,
     username: req?.body?.username,
     bio: req?.body?.bio,
-    passwordHash: req?.body?.passwordHash,
+    passwordHash: hashedPassword,
   };
 
   const user = await createUserDB(data);
