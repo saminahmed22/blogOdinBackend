@@ -2,6 +2,7 @@ import { generateKeyPairSync } from "crypto";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import "dotenv/config";
 
 function generateKeyPair() {
   const keyPair = generateKeyPairSync("rsa", {
@@ -22,7 +23,6 @@ function generateKeyPair() {
   const privateKeyPath = path.join(keysPath, "id_rsa_priv.pem");
 
   // Write public key file
-
   fs.writeFileSync(publicKeyPath, keyPair.publicKey);
 
   // Write privet key file
@@ -35,34 +35,31 @@ function generateKeyPair() {
  * @returns {String | {public: String, private: String}} Returns either or both the public or the private key.
  */
 export function getKeys({ type = "public" } = {}) {
-  const abPath = path.dirname(fileURLToPath(import.meta.url));
-  const keysPath = path.join(abPath, "keys");
+  let publicKeyBase64, privateKeyBase64, publicKey, privateKey;
 
-  let publicKeyPath, privateKeyPath, publicKey, privateKey;
   switch (type) {
     case "both":
-      publicKeyPath = path.join(keysPath, "id_rsa_pub.pem");
-      privateKeyPath = path.join(keysPath, "id_rsa_priv.pem");
+      publicKeyBase64 = process.env.JWT_PUBLIC_KEY;
+      privateKeyBase64 = process.env.JWT_PRIVATE_KEY;
 
-      publicKey = fs.readFileSync(publicKeyPath, "utf-8");
-      privateKey = fs.readFileSync(privateKeyPath, "utf-8");
+      publicKey = Buffer.from(publicKeyBase64, "base64").toString();
+      privateKey = Buffer.from(privateKeyBase64, "base64").toString();
 
       return { publicKey, privateKey };
 
     case "private":
-      privateKeyPath = path.join(keysPath, "id_rsa_priv.pem");
-
-      privateKey = fs.readFileSync(privateKeyPath, "utf-8");
+      privateKeyBase64 = process.env.JWT_PRIVATE_KEY;
+      privateKey = Buffer.from(privateKeyBase64, "base64").toString();
 
       return privateKey;
 
     case "public":
-      publicKeyPath = path.join(keysPath, "id_rsa_pub.pem");
-      publicKey = fs.readFileSync(publicKeyPath, "utf-8");
+      publicKeyBase64 = process.env.JWT_PUBLIC_KEY;
+      publicKey = Buffer.from(publicKeyBase64, "base64").toString();
 
       return publicKey;
 
     default:
-      return new Error(`Invalid type "${type}"`);
+      return new Error(`Invalid type "${type}".`);
   }
 }
