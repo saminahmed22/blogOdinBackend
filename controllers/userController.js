@@ -7,7 +7,7 @@ import {
 } from "../models/userModel.js";
 
 // Utils
-import { hashString } from "../utils/crypto.js";
+import { hashString } from "../crypto/hash.js";
 
 export async function getUser(req, res, next) {
   const userID = req.params.id;
