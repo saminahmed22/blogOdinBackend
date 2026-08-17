@@ -4,11 +4,25 @@ import "dotenv/config";
 import express from "express";
 const app = express();
 
+// View
+app.set("/views");
+app.set("view engine", "ejs");
+
 // Parsing texts
 app.use(express.urlencoded({ extended: true }));
 
+// Passport
+// import flash from "connect-flash";
+
+// import "./lib/passport.js";
+
+// app.use(flash());
+
 // Routes
 import { apiRouter } from "./routers/apiRouter.js";
+import { authRouter } from "./routers/authRouter.js";
+
+app.use("/auth", authRouter);
 
 app.use("/api", apiRouter);
 
