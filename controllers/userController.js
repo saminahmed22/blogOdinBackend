@@ -8,6 +8,7 @@ import {
 
 // Utils
 import { hashString } from "../crypto/hash.js";
+import { issueJWT } from "../utils/issueJwt.js";
 
 export async function getUser(req, res, next) {
   const userID = req.params.id;
@@ -63,9 +64,24 @@ export async function createUser(req, res, next) {
         break;
     }
 
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
+    return res
+      .status(statusCode)
+      .json({ error: errorMessage, code: errorCode });
   } else {
-    res.json(user);
+    const payload = {
+      id: user.id,
+      name: `${user.firstName} ${user.lastName}`,
+      username: user.username,
+      role: user.role,
+    };
+
+    const jwtToken = await issueJWT(payload);
+
+    delete user["passwordHash"];
+
+    const response = { userData: user, jwt: jwtToken };
+
+    res.json(response);
   }
 }
 
