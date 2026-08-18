@@ -7,6 +7,6 @@ import { commentRouter } from "./commentRouter.js";
 import { authRouter } from "./authRouter.js";
 
 apiRouter.use("/auth", authRouter);
-apiRouter.use("/user", userRouter);
-apiRouter.use("/post", postRouter);
-apiRouter.use("/comment", commentRouter);
+apiRouter.use("/users", userRouter);
+apiRouter.use("/posts", postRouter);
+apiRouter.use("/comments", commentRouter);
