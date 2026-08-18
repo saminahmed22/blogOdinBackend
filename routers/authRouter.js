@@ -7,14 +7,7 @@ import passport from "passport";
 import {
   renderLoginPage,
   handleLoginRequest,
-  renderRegisterPage,
-  handleRegisterRequest,
 } from "../controllers/authController.js";
-
-// Get
-authRouter.get("/login", renderLoginPage);
-
-authRouter.get("/register", renderRegisterPage);
 
 // Post
 authRouter.post(
@@ -26,5 +19,3 @@ authRouter.post(
   //   failureRedirect: "/auth/login",
   // }),
 );
-
-authRouter.post("/register", handleRegisterRequest);
