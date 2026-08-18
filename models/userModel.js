@@ -6,11 +6,13 @@ export async function getUserDB({ id = null, username = null }) {
       id ? { where: { id } } : { where: { username } },
     );
 
+    if (!user) throw new Error(`Wrong username or password.`); //AAH
+
     return user;
   } catch (error) {
     const errorCode = error.code;
 
-    return new Error(errorCode);
+    throw new Error(errorCode);
   }
 }
 
