@@ -69,7 +69,7 @@ export async function createUser(req, res, next) {
       .json({ error: errorMessage, code: errorCode });
   } else {
     const payload = {
-      id: user.id,
+      sub: user.id,
       name: `${user.firstName} ${user.lastName}`,
       username: user.username,
       role: user.role,
