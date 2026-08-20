@@ -5,11 +5,6 @@ import { issueJWT } from "../utils/issueJwt.js";
 import { createUser } from "./userController.js";
 import { getUserDB } from "../models/userModel.js";
 
-// Login
-export async function renderLoginPage(req, res, next) {
-  res.render("login");
-}
-
 export async function handleLoginRequest(req, res, next) {
   const username = req.body.username;
   const givenPassword = req.body.password;
@@ -27,7 +22,7 @@ export async function handleLoginRequest(req, res, next) {
     }
 
     const payload = {
-      id: user.id,
+      sub: user.id,
       name: `${user.firstName} ${user.lastName}`,
       username: user.username,
       role: user.role,
