@@ -15,7 +15,7 @@ export async function getUser(req, res, next) {
   const user = await getUserDB({ id: userID });
 
   if (user instanceof Error) {
-    const errorCode = user.message;
+    const errorCode = user.message.code;
 
     let statusCode, errorMessage;
 
