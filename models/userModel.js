@@ -10,9 +10,7 @@ export async function getUserDB({ id = null, username = null }) {
 
     return user;
   } catch (error) {
-    const errorCode = error.code;
-
-    throw new Error(errorCode);
+    throw new Error(error);
   }
 }
 
