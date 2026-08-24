@@ -12,6 +12,18 @@ export async function getPostDB(postID) {
   }
 }
 
+export async function getPostsDB(quantity) {
+  try {
+    const posts = await prisma.post.findMany({ take: quantity });
+
+    return posts;
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
 export async function createPostDB(data) {
   try {
     const post = await prisma.post.create({ data });

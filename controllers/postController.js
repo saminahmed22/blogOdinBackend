@@ -1,6 +1,7 @@
 // Modles
 import {
   getPostDB,
+  getPostsDB,
   createPostDB,
   editPostDB,
   deletePostDB,
@@ -28,11 +29,19 @@ export async function getPost(req, res, next) {
   }
 }
 
+export async function getPosts(req, res, next) {
+  const quantity = Number(req?.params?.quantity || 10);
+
+  const posts = await getPostsDB(quantity);
+
+  res.json(posts);
+}
+
 export async function createPost(req, res, next) {
   const data = {
     title: req?.body?.title,
     description: req?.body?.description,
-    authorId: "019ffbc2-7319-71da-83f3-b271f6a40e7e",
+    authorId: req?.body?.authorId,
   };
 
   const post = await createPostDB(data);
