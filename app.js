@@ -4,6 +4,10 @@ import "dotenv/config";
 import express from "express";
 const app = express();
 
+// CORS
+import cors from "cors";
+app.use(cors());
+
 // Parsing form texts
 app.use(express.urlencoded({ extended: true }));
 
