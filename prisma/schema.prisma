@@ -25,6 +25,13 @@ model User {
   Comments           Comment[]
 }
 
+model Category{
+  id    Int @id @default(autoincrement())
+  name  String
+  posts Post[]
+}
+
+
 model Post {
   id          String    @id @default(nanoid(10))
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -34,8 +41,12 @@ model Post {
   published   Boolean   @default(true)
   created_at  DateTime  @default(now())
   edited_at   DateTime  @updatedAt
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  Int
   comments    Comment[]
 }
+
+
 
 model Comment {
   id         String   @id @default(nanoid(10))
@@ -47,3 +58,5 @@ model Comment {
   edited_at  DateTime @updatedAt
   content    String
 }
+
+
