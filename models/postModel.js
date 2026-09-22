@@ -12,9 +12,12 @@ export async function getPostDB(postID) {
   }
 }
 
-export async function getPostsDB(quantity) {
+export async function getPostsDB(quantity, category) {
   try {
-    const posts = await prisma.post.findMany({ take: quantity });
+    const posts = await prisma.post.findMany({
+      take: quantity,
+      where: { category: category ?? undefined },
+    });
 
     return posts;
   } catch (error) {
