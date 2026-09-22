@@ -31,8 +31,9 @@ export async function getPost(req, res, next) {
 
 export async function getPosts(req, res, next) {
   const quantity = Number(req?.params?.quantity || 10);
+  const categoryId = req?.query?.categoryId || undefined;
 
-  const posts = await getPostsDB(quantity);
+  const posts = await getPostsDB(quantity, categoryId);
 
   res.json(posts);
 }
@@ -42,6 +43,7 @@ export async function createPost(req, res, next) {
     title: req?.body?.title,
     description: req?.body?.description,
     authorId: req?.body?.authorId,
+    categoryId: req?.body?.categoryId,
   };
 
   const post = await createPostDB(data);
@@ -66,10 +68,11 @@ export async function createPost(req, res, next) {
 
 export async function editPost(req, res, next) {
   const data = {
-    id: "3ID7uV_Dpo",
-    authorId: "019ffbc2-7319-71da-83f3-b271f6a40e7e",
+    id: req?.body?.postId,
+    authorId: req?.body?.authorId,
     title: req?.body?.title,
     description: req?.body?.description,
+    categoryId: req?.body?.categoryId,
   };
 
   const post = await editPostDB(data);
