@@ -43,7 +43,8 @@ export async function createPost(req, res, next) {
     title: req?.body?.title,
     description: req?.body?.description,
     authorId: req?.body?.authorId,
-    categoryId: req?.body?.categoryId,
+    categoryId: Number(req?.body?.categoryId),
+    published: req?.body?.published === "true",
   };
 
   const post = await createPostDB(data);
@@ -51,16 +52,7 @@ export async function createPost(req, res, next) {
   if (post instanceof Error) {
     const errorCode = post.message;
 
-    let statusCode, errorMessage;
-
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
-
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
+    res.json({ error: errorCode });
   } else {
     res.json(post);
   }
@@ -72,7 +64,8 @@ export async function editPost(req, res, next) {
     authorId: req?.body?.authorId,
     title: req?.body?.title,
     description: req?.body?.description,
-    categoryId: req?.body?.categoryId,
+    categoryId: Number(req?.body?.categoryId),
+    published: req?.body?.published === "true",
   };
 
   const post = await editPostDB(data);
