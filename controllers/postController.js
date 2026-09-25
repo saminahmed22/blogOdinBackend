@@ -2,6 +2,7 @@
 import {
   getPostDB,
   getPostsDB,
+  findPostsDB,
   createPostDB,
   editPostDB,
   deletePostDB,
@@ -36,6 +37,12 @@ export async function getPosts(req, res, next) {
   const posts = await getPostsDB(quantity, categoryId);
 
   res.json(posts);
+}
+
+export async function findPosts(searchQuery) {
+  const posts = await findPostsDB(searchQuery);
+
+  return posts;
 }
 
 export async function createPost(req, res, next) {
