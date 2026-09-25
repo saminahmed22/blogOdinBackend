@@ -27,6 +27,25 @@ export async function getPostsDB(quantity, categoryId) {
   }
 }
 
+export async function findPostsDB(searchQuery) {
+  try {
+    const posts = await prisma.post.findMany({
+      where: {
+        OR: [
+          { title: { contains: searchQuery, mode: "insensitive" } },
+          { description: { contains: searchQuery, mode: "insensitive" } },
+        ],
+      },
+    });
+
+    return posts;
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
 export async function createPostDB(data) {
   try {
     const post = await prisma.post.create({ data });
