@@ -10,6 +10,7 @@ app.use(cors());
 
 // Parsing form texts
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Passport
 import flash from "connect-flash";
