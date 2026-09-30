@@ -2,7 +2,21 @@ import { prisma } from "../lib/prisma.js";
 
 export async function getPostDB(postID) {
   try {
-    const post = await prisma.post.findUnique({ where: { id: postID } });
+    const post = await prisma.post.findUnique({
+      where: { id: postID },
+      include: {
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+            bio: true,
+            profilePictureLink: true,
+            username: true,
+            role: true,
+          },
+        },
+      },
+    });
 
     return post;
   } catch (error) {
@@ -12,11 +26,23 @@ export async function getPostDB(postID) {
   }
 }
 
-export async function getPostsDB(quantity, categoryId) {
+export async function getPostsDB(categoryId, quantity) {
   try {
     const posts = await prisma.post.findMany({
-      take: quantity,
       where: { categoryId },
+      take: quantity,
+      include: {
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+            bio: true,
+            profilePictureLink: true,
+            username: true,
+            role: true,
+          },
+        },
+      },
     });
 
     return posts;
@@ -35,6 +61,18 @@ export async function findPostsDB(searchQuery) {
           { title: { contains: searchQuery, mode: "insensitive" } },
           { description: { contains: searchQuery, mode: "insensitive" } },
         ],
+      },
+      include: {
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+            bio: true,
+            profilePictureLink: true,
+            username: true,
+            role: true,
+          },
+        },
       },
     });
 

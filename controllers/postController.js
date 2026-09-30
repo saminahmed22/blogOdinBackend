@@ -31,10 +31,13 @@ export async function getPost(req, res, next) {
 }
 
 export async function getPosts(req, res, next) {
-  const quantity = Number(req?.params?.quantity || 10);
-  const categoryId = req?.query?.categoryId || undefined;
+  const categoryIdNum = Number(req?.params?.category);
 
-  const posts = await getPostsDB(quantity, categoryId);
+  const categoryId = categoryIdNum >= 1 ? categoryIdNum : undefined;
+
+  const quantity = Number(req?.params?.quantity) ?? 10;
+
+  const posts = await getPostsDB(categoryId, quantity);
 
   res.json(posts);
 }

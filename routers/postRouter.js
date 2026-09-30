@@ -11,7 +11,7 @@ import {
   deletePost,
 } from "../controllers/postController.js";
 
-postRouter.get("/feed{/:quantity}", getPosts);
+postRouter.get("/feed{/:category}{/:quantity}", getPosts);
 
 postRouter.get("/:id", getPost);
 
