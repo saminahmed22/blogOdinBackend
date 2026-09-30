@@ -17,7 +17,7 @@ export async function handleLoginRequest(req, res, next) {
     if (!isValid) {
       return res.status(401).json({
         success: false,
-        message: "Wrong username or password.",
+        message: "!credit",
       });
     }
 
@@ -32,10 +32,10 @@ export async function handleLoginRequest(req, res, next) {
 
     delete user["passwordHash"];
 
-    const response = { user, jwt };
+    const response = { success: true, user, jwt };
 
-    res.json(response);
+    res.status(200).json(response);
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: "error" });
   }
 }
