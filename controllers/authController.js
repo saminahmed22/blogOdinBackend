@@ -12,6 +12,13 @@ export async function handleLoginRequest(req, res, next) {
   try {
     const user = await getUserDB({ username });
 
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "!credit",
+      });
+    }
+
     const isValid = await verifyPassword(user.passwordHash, givenPassword);
 
     if (!isValid) {
