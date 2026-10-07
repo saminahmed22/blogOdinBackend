@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id                 String    @id @default(uuid(7))
+  id                 String    @id @default(nanoid(15))
   role               String    @default("general")
   firstName          String
   lastName           String
@@ -18,17 +18,18 @@ model User {
   bio                String?
   posts              Post[]
   Comments           Comment[]
+  joined_at          DateTime  @default(now())
+  theme_color        String
 }
 
 model Category {
-  id    Int @id @default(autoincrement())
+  id    Int    @id @default(autoincrement())
   name  String
   posts Post[]
 }
 
-
 model Post {
-  id          String    @id @default(nanoid(10))
+  id          String    @id @default(nanoid(15))
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String
   title       String
@@ -36,15 +37,13 @@ model Post {
   published   Boolean   @default(true)
   created_at  DateTime  @default(now())
   edited_at   DateTime  @updatedAt
-  category    Category @relation(fields: [categoryId], references: [id])
+  category    Category  @relation(fields: [categoryId], references: [id])
   categoryId  Int
   comments    Comment[]
 }
 
-
-
 model Comment {
-  id         String   @id @default(nanoid(10))
+  id         String   @id @default(nanoid(15))
   author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId   String
   Post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -53,5 +52,3 @@ model Comment {
   edited_at  DateTime @updatedAt
   content    String
 }
-
-
