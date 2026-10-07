@@ -16,7 +16,7 @@ export async function createUserDB(data) {
   try {
     const user = await prisma.user.create({ data });
 
-    return { user };
+    return user;
   } catch (error) {
     const errorCode = error.code;
 
