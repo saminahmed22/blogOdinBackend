@@ -83,10 +83,11 @@ export async function getCategoriesDB() {
 //     return new Error(errorCode);
 //   }
 // }
-//#endregion
 
 // (async () => {
-//   const c = await getCategoriesDB();
+//   const c = await createCategories(categoriesArr);
 
 //   console.log(c);
 // })();
+
+//#endregion
