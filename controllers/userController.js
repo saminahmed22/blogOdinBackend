@@ -10,6 +10,8 @@ import {
 import { hashString } from "../crypto/hash.js";
 import { issueJWT } from "../utils/issueJwt.js";
 
+import randomColor from "random-color";
+
 export async function getUser(req, res, next) {
   const userID = req.params.id;
   const user = await getUserDB({ id: userID });
@@ -37,12 +39,15 @@ export async function createUser(req, res, next) {
 
   const hashedPassword = await hashString(givenPassword);
 
+  const userColor = randomColor();
+
   const data = {
     firstName: req?.body?.firstName,
     lastName: req?.body?.lastName,
     username: req?.body?.username,
     bio: req?.body?.bio,
     passwordHash: hashedPassword,
+    theme_color: `rgb(${userColor?.values?.rgb[0]}, ${userColor?.values?.rgb[1]}, ${userColor?.values?.rgb[2]})`,
   };
 
   const user = await createUserDB(data);
