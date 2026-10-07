@@ -71,7 +71,7 @@ export async function createUser(req, res, next) {
 
     return res
       .status(statusCode)
-      .json({ error: errorMessage, code: errorCode });
+      .json({ success: false, error: errorMessage, code: errorCode });
   } else {
     const payload = {
       sub: user.id,
@@ -84,7 +84,7 @@ export async function createUser(req, res, next) {
 
     delete user["passwordHash"];
 
-    const response = { userData: user, jwt: jwtToken };
+    const response = { success: true, user, jwt: jwtToken };
 
     res.json(response);
   }
