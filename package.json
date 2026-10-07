@@ -35,7 +35,8 @@
     "passport-jwt": "^4.0.1",
     "pg": "^8.23.0",
     "prettier-plugin-ejs": "^1.0.3",
-    "prettier-plugin-prisma": "^5.0.0"
+    "prettier-plugin-prisma": "^5.0.0",
+    "random-color": "^1.0.1"
   },
   "devDependencies": {
     "prisma": "^7.9.1"
