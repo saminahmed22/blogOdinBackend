@@ -3,16 +3,24 @@ import { prisma } from "../lib/prisma.js";
 export async function getPostDB(postID) {
   try {
     const post = await prisma.post.findUnique({
-      where: { id: postID },
+      where: { id: postID, published: true },
       include: {
         author: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
             bio: true,
             profilePictureLink: true,
             username: true,
             role: true,
+            theme_color: true,
+            joined_at: true,
+          },
+        },
+        category: {
+          select: {
+            name: true,
           },
         },
       },
@@ -29,19 +37,30 @@ export async function getPostDB(postID) {
 export async function getPostsDB(categoryId, quantity) {
   try {
     const posts = await prisma.post.findMany({
-      where: { categoryId },
+      where: { categoryId, published: true },
       take: quantity,
       include: {
         author: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
             bio: true,
             profilePictureLink: true,
             username: true,
             role: true,
+            theme_color: true,
+            joined_at: true,
           },
         },
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        created_at: "desc",
       },
     });
 
@@ -61,18 +80,30 @@ export async function findPostsDB(searchQuery) {
           { title: { contains: searchQuery, mode: "insensitive" } },
           { description: { contains: searchQuery, mode: "insensitive" } },
         ],
+        published: true,
       },
       include: {
         author: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
             bio: true,
             profilePictureLink: true,
             username: true,
             role: true,
+            theme_color: true,
+            joined_at: true,
           },
         },
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        created_at: "desc",
       },
     });
 
