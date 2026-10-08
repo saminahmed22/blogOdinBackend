@@ -34,7 +34,7 @@ export async function getPostDB(postID) {
   }
 }
 
-export async function getPostsDB(categoryId, quantity) {
+export async function getPostsDB(categoryId, quantity, index) {
   try {
     const posts = await prisma.post.findMany({
       where: { categoryId, published: true },
@@ -62,6 +62,7 @@ export async function getPostsDB(categoryId, quantity) {
       orderBy: {
         created_at: "desc",
       },
+      skip: index,
     });
 
     return posts;

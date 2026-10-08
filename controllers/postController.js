@@ -37,7 +37,9 @@ export async function getPosts(req, res, next) {
 
   const quantity = Number(req?.params?.quantity) ?? 10;
 
-  const posts = await getPostsDB(categoryId, quantity);
+  const index = Number(req?.params?.index);
+
+  const posts = await getPostsDB(categoryId, quantity, index);
 
   res.json(posts);
 }
