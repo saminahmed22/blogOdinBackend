@@ -6,12 +6,15 @@ export const postRouter = Router();
 import {
   getPost,
   getPosts,
+  findPosts,
   createPost,
   editPost,
   deletePost,
 } from "../controllers/postController.js";
 
-postRouter.get("/feed{/:category}{/:quantity}{/:index}", getPosts);
+postRouter.get("/feed", getPosts);
+
+postRouter.get("/search", findPosts);
 
 postRouter.get("/:id", getPost);
 

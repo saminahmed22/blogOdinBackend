@@ -5,12 +5,10 @@ import { userRouter } from "./userRouter.js";
 import { postRouter } from "./postRouter.js";
 import { commentRouter } from "./commentRouter.js";
 import { authRouter } from "./authRouter.js";
-import { searchRouter } from "./searchRouter.js";
 import { categoryRouter } from "./categoryRouter.js";
 
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/users", userRouter);
 apiRouter.use("/posts", postRouter);
 apiRouter.use("/comments", commentRouter);
-apiRouter.use("/search", searchRouter);
 apiRouter.use("/categories", categoryRouter);

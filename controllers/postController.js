@@ -9,45 +9,53 @@ import {
 } from "../models/postModel.js";
 
 export async function getPost(req, res, next) {
-  const postID = req.params.id;
-  const post = await getPostDB(postID);
+  try {
+    const postID = req.params.id;
+    const post = await getPostDB(postID);
 
-  if (post instanceof Error) {
-    const errorCode = post.message;
-
-    let statusCode, errorMessage;
-
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
-
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
-  } else {
-    res.json(post);
+    res.json({ success: true, post: { ...post } });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
   }
 }
 
 export async function getPosts(req, res, next) {
-  const categoryIdNum = Number(req?.params?.category);
+  try {
+    const categoryId =
+      req?.query?.categoryId === "undefined"
+        ? undefined
+        : Number(req?.query?.categoryId);
 
-  const categoryId = categoryIdNum >= 1 ? categoryIdNum : undefined;
+    const quantity = Number(req?.query?.quantity) ?? 10;
 
-  const quantity = Number(req?.params?.quantity) ?? 10;
+    const cursor =
+      req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
 
-  const index = Number(req?.params?.index);
+    const posts = await getPostsDB(categoryId, quantity, cursor);
 
-  const posts = await getPostsDB(categoryId, quantity, index);
-
-  res.json(posts);
+    res.json({ success: true, ...posts });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
 }
 
-export async function findPosts(searchQuery) {
-  const posts = await findPostsDB(searchQuery);
+export async function findPosts(req, res, next) {
+  try {
+    const query = req?.query?.query;
 
-  return posts;
+    if (!query.length) return;
+
+    const quantity = Number(req?.query?.quantity) ?? 10;
+
+    const cursor =
+      req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
+
+    const posts = await findPostsDB(query, quantity, cursor);
+
+    res.json({ success: true, ...posts });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
 }
 
 export async function createPost(req, res, next) {
