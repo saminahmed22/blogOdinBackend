@@ -4,26 +4,7 @@ export async function getPostDB(postID) {
   try {
     const post = await prisma.post.findUnique({
       where: { id: postID, published: true },
-      include: {
-        author: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            bio: true,
-            profilePictureLink: true,
-            username: true,
-            role: true,
-            theme_color: true,
-            joined_at: true,
-          },
-        },
-        category: {
-          select: {
-            name: true,
-          },
-        },
-      },
+      include: { author: true, category: true },
     });
 
     return post;
@@ -34,38 +15,25 @@ export async function getPostDB(postID) {
   }
 }
 
-export async function getPostsDB(categoryId, quantity, index) {
+export async function getPostsDB(categoryId, quantity, cursor) {
   try {
     const posts = await prisma.post.findMany({
-      where: { categoryId, published: true },
       take: quantity,
-      include: {
-        author: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            bio: true,
-            profilePictureLink: true,
-            username: true,
-            role: true,
-            theme_color: true,
-            joined_at: true,
-          },
-        },
-        category: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      orderBy: {
-        created_at: "desc",
-      },
-      skip: index,
+      ...(cursor ? { cursor: { id: cursor } } : {}),
+      skip: cursor ? 1 : 0,
+
+      where: { categoryId, published: true },
+
+      include: { author: true, category: true },
+
+      orderBy: { created_at: "desc" },
     });
 
-    return posts;
+    const count = await prisma.post.count({
+      where: { categoryId, published: true },
+    });
+
+    return { posts, count };
   } catch (error) {
     const errorCode = error.code;
 
@@ -73,42 +41,46 @@ export async function getPostsDB(categoryId, quantity, index) {
   }
 }
 
-export async function findPostsDB(searchQuery) {
+export async function findPostsDB(searchQuery, quantity, cursor) {
   try {
     const posts = await prisma.post.findMany({
+      take: quantity,
+      ...(cursor ? { cursor: { id: cursor } } : {}),
+      skip: cursor ? 1 : 0,
+      where: {
+        OR: [
+          { title: { contains: searchQuery, mode: "insensitive" } },
+          { description: { contains: searchQuery, mode: "insensitive" } },
+          {
+            author: {
+              OR: [
+                { firstName: { contains: searchQuery, mode: "insensitive" } },
+                { lastName: { contains: searchQuery, mode: "insensitive" } },
+              ],
+            },
+          },
+        ],
+
+        published: true,
+      },
+
+      include: { author: true, category: true },
+
+      orderBy: { created_at: "desc" },
+    });
+
+    const count = await prisma.post.count({
       where: {
         OR: [
           { title: { contains: searchQuery, mode: "insensitive" } },
           { description: { contains: searchQuery, mode: "insensitive" } },
         ],
+
         published: true,
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            bio: true,
-            profilePictureLink: true,
-            username: true,
-            role: true,
-            theme_color: true,
-            joined_at: true,
-          },
-        },
-        category: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      orderBy: {
-        created_at: "desc",
       },
     });
 
-    return posts;
+    return { posts, count };
   } catch (error) {
     const errorCode = error.code;
 
