@@ -1,85 +1,58 @@
 // Modles
 import {
-  getCommentDB,
+  getCommentsDB,
   createCommentDB,
   editCommentDB,
   deleteCommentDB,
 } from "../models/commentModel.js";
 
-export async function getComment(req, res, next) {
-  const commentID = req.params.id;
-  const comment = await getCommentDB(commentID);
+export async function getComments(req, res, next) {
+  const postID = req.params.postId;
 
-  if (comment instanceof Error) {
-    const errorCode = comment.message;
+  try {
+    const comments = await getCommentsDB(postID);
 
-    let statusCode, errorMessage;
-
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
-
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
-  } else {
-    res.json(comment);
+    res.json({ success: true, comments: { ...comments } });
+  } catch (error) {
+    res.json({ success: false, error });
   }
 }
 
 export async function createComment(req, res, next) {
   const data = {
-    content: req?.body?.content,
-    postId: "3ID7uV_Dpo",
-    authorId: "019ffbc2-7319-71da-83f3-b271f6a40e7e",
+    content: req?.body?.comment,
+    postId: req?.body?.postId,
+    authorId: req?.user?.id,
   };
 
-  const comment = await createCommentDB(data);
+  try {
+    const newComment = await createCommentDB(data);
 
-  if (comment instanceof Error) {
-    const errorCode = comment.message;
-
-    let statusCode, errorMessage;
-
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
-
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
-  } else {
-    res.json(comment);
+    res.json({ success: true, comment: { ...newComment } });
+  } catch (error) {
+    res.json({ success: false, error });
   }
 }
 
 export async function editComment(req, res, next) {
   const data = {
-    id: "Hp7gQVr9-2",
-    authorId: "019ffbc2-7319-71da-83f3-b271f6a40e7e",
-    postId: "3ID7uV_Dpo",
+    id: req?.body?.id,
+    postId: req?.body?.postId,
     content: req?.body?.content,
+    authorId: req?.body?.authorId,
+    requesterId: req?.user?.id,
   };
 
-  const comment = await editCommentDB(data);
+  if (data.requesterId !== data.authorId) {
+    return res.json({ success: false, error: "unauthorize" });
+  }
 
-  if (comment instanceof Error) {
-    const errorCode = comment.message;
+  try {
+    const comment = await editCommentDB(data);
 
-    let statusCode, errorMessage;
-
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
-
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
-  } else {
-    res.json(comment);
+    res.json({ success: true, ...comment });
+  } catch (error) {
+    res.json({ success: false, error });
   }
 }
 
