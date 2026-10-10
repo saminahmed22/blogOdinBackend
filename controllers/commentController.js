@@ -7,12 +7,17 @@ import {
 } from "../models/commentModel.js";
 
 export async function getComments(req, res, next) {
-  const postID = req.params.postId;
+  const postId = req?.query?.postId;
+
+  const quantity = Number(req?.query?.quantity) ?? 10;
+
+  const cursor =
+    req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
 
   try {
-    const comments = await getCommentsDB(postID);
+    const comments = await getCommentsDB(postId, quantity, cursor);
 
-    res.json({ success: true, comments: { ...comments } });
+    res.json({ success: true, ...comments });
   } catch (error) {
     res.json({ success: false, error });
   }

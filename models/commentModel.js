@@ -1,14 +1,24 @@
 import { prisma } from "../lib/prisma.js";
 
-export async function getCommentsDB(postId) {
+export async function getCommentsDB(postId, quantity, cursor) {
   try {
     const comments = await prisma.comment.findMany({
+      take: quantity,
+      ...(cursor ? { cursor: { id: cursor } } : {}),
+      skip: cursor ? 1 : 0,
+
       where: { postId },
+
       include: { author: true },
+
       orderBy: { created_at: "desc" },
     });
 
-    return comments;
+    const count = await prisma.comment.count({
+      where: { postId: postId },
+    });
+
+    return { comments, count };
   } catch (error) {
     const errorCode = error.code;
 
