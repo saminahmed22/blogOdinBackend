@@ -19,6 +19,10 @@ export async function getComments(req, res, next) {
 }
 
 export async function createComment(req, res, next) {
+  if (!req.user) {
+    return res.json({ success: false, error });
+  }
+
   const data = {
     content: req?.body?.comment,
     postId: req?.body?.postId,
@@ -35,6 +39,10 @@ export async function createComment(req, res, next) {
 }
 
 export async function editComment(req, res, next) {
+  if (!req.user) {
+    return res.json({ success: false, error });
+  }
+
   const data = {
     id: req?.body?.id,
     postId: req?.body?.postId,
@@ -57,23 +65,26 @@ export async function editComment(req, res, next) {
 }
 
 export async function deleteComment(req, res, next) {
-  const commentID = req.params.id;
-  const comment = await deleteCommentDB(commentID);
+  if (!req.user) {
+    return res.json({ success: false });
+  }
 
-  if (comment instanceof Error) {
-    const errorCode = comment.message;
+  const data = {
+    id: req?.body?.id,
+    postId: req?.body?.postId,
+    authorId: req?.body?.authorId,
+    requesterId: req?.user?.id,
+  };
 
-    let statusCode, errorMessage;
+  if (data.requesterId !== data.authorId) {
+    return res.json({ success: false, error: "unauthorize" });
+  }
 
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
+  try {
+    const hasDeleted = await deleteCommentDB(data);
 
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
-  } else {
-    res.json(comment);
+    res.json({ success: hasDeleted });
+  } catch (error) {
+    res.json({ success: false, error });
   }
 }
