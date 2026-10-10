@@ -4,16 +4,30 @@ export const commentRouter = Router();
 
 // Controller
 import {
-  getComment,
+  getComments,
   createComment,
   editComment,
   deleteComment,
 } from "../controllers/commentController.js";
 
-commentRouter.get("/:id", getComment);
+import passport from "passport";
 
-commentRouter.post("/", createComment);
+commentRouter.get("/:postId", getComments);
 
-commentRouter.put("/", editComment);
+commentRouter.post(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  createComment,
+);
 
-commentRouter.delete("/:id", deleteComment);
+commentRouter.put(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  editComment,
+);
+
+commentRouter.delete(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  deleteComment,
+);
