@@ -1,12 +1,14 @@
 import { prisma } from "../lib/prisma.js";
 
-export async function getCommentDB(commentID) {
+export async function getCommentsDB(postId) {
   try {
-    const comment = await prisma.comment.findUnique({
-      where: { id: commentID },
+    const comments = await prisma.comment.findMany({
+      where: { postId },
+      include: { author: true },
+      orderBy: { created_at: "desc" },
     });
 
-    return comment;
+    return comments;
   } catch (error) {
     const errorCode = error.code;
 
@@ -16,7 +18,10 @@ export async function getCommentDB(commentID) {
 
 export async function createCommentDB(data) {
   try {
-    const comment = await prisma.comment.create({ data });
+    const comment = await prisma.comment.create({
+      data,
+      include: { author: true },
+    });
 
     return comment;
   } catch (error) {
@@ -29,8 +34,8 @@ export async function createCommentDB(data) {
 export async function editCommentDB(data) {
   try {
     const comment = await prisma.comment.update({
-      data,
-      where: { id: data.id, postId: data.postId, authorId: data.authorId },
+      data: { content: data.content },
+      where: { id: data.id, postId: data.postId, authorId: data.requesterId },
     });
 
     return { comment };
