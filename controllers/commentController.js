@@ -51,7 +51,7 @@ export async function editComment(req, res, next) {
   const data = {
     id: req?.body?.id,
     postId: req?.body?.postId,
-    content: req?.body?.content,
+    content: req?.body?.comment,
     authorId: req?.body?.authorId,
     requesterId: req?.user?.id,
   };
