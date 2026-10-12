@@ -88,6 +88,27 @@ export async function findPostsDB(searchQuery, quantity, cursor) {
   }
 }
 
+export async function getUserPostsDB(userId, quantity, cursor, isAuthor) {
+  try {
+    const posts = await prisma.post.findMany({
+      take: quantity,
+      ...(cursor ? { cursor: { id: cursor } } : {}),
+      skip: cursor ? 1 : 0,
+
+      where: { authorId: userId, ...(isAuthor ? {} : { published: true }) },
+      orderBy: { created_at: "desc" },
+
+      include: { author: true, category: true },
+    });
+
+    return posts;
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
 export async function createPostDB(data) {
   try {
     const post = await prisma.post.create({ data });
