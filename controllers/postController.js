@@ -6,6 +6,7 @@ import {
   createPostDB,
   editPostDB,
   deletePostDB,
+  getUserPostsDB,
 } from "../models/postModel.js";
 
 export async function getPost(req, res, next) {
@@ -53,6 +54,32 @@ export async function findPosts(req, res, next) {
     const posts = await findPostsDB(query, quantity, cursor);
 
     res.json({ success: true, ...posts });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+}
+
+export async function getUserPosts(req, res, next) {
+  const userId = req?.query?.userId;
+
+  let isAuthor = false;
+  if (req.user) {
+    isAuthor = req.user.id === userId;
+  }
+
+  const quantity = Number(req?.query?.quantity) ?? 10;
+
+  const cursor =
+    req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
+
+  console.log({ userId, quantity, cursor, isAuthor });
+
+  try {
+    const posts = await getUserPostsDB(userId, quantity, cursor, isAuthor);
+
+    console.log(posts);
+
+    res.json({ success: true, posts });
   } catch (error) {
     res.status(500).json({ success: false, error });
   }
