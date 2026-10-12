@@ -2,9 +2,9 @@ import { prisma } from "../lib/prisma.js";
 
 export async function getUserDB({ id = null, username = null }) {
   try {
-    const user = await prisma.user.findUnique(
-      id ? { where: { id } } : { where: { username } },
-    );
+    const user = await prisma.user.findUnique({
+      ...(id ? { where: { id } } : { where: { username } }),
+    });
 
     return user;
   } catch (error) {
