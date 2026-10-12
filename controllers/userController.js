@@ -14,23 +14,13 @@ import randomColor from "random-color";
 
 export async function getUser(req, res, next) {
   const userID = req.params.id;
-  const user = await getUserDB({ id: userID });
 
-  if (user instanceof Error) {
-    const errorCode = user.message.code;
+  try {
+    const user = await getUserDB({ id: userID });
 
-    let statusCode, errorMessage;
-
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
-
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
-  } else {
-    res.json(user);
+    return res.json({ success: true, user });
+  } catch (error) {
+    return res.json({ success: false, error });
   }
 }
 
