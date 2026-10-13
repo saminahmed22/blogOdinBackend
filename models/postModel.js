@@ -101,7 +101,11 @@ export async function getUserPostsDB(userId, quantity, cursor, isAuthor) {
       include: { author: true, category: true },
     });
 
-    return posts;
+    const count = await prisma.post.count({
+      where: { authorId: userId, ...(isAuthor ? {} : { published: true }) },
+    });
+
+    return { posts, count };
   } catch (error) {
     const errorCode = error.code;
 
