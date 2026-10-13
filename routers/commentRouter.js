@@ -12,11 +12,14 @@ import {
   createComment,
   editComment,
   deleteComment,
+  getUserComments,
 } from "../controllers/commentController.js";
 
 import passport from "passport";
 
 commentRouter.get("/", getComments);
+
+commentRouter.get("/user", getUserComments);
 
 commentRouter.post(
   "/",
