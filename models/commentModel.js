@@ -26,6 +26,45 @@ export async function getCommentsDB(postId, quantity, cursor) {
   }
 }
 
+export async function getUserCommentsDB(
+  userId,
+  quantity,
+  cursor,
+  isProfileOwner,
+) {
+  try {
+    const comments = await prisma.comment.findMany({
+      take: quantity,
+      ...(cursor ? { cursor: { id: cursor } } : {}),
+      skip: cursor ? 1 : 0,
+
+      where: {
+        authorId: userId,
+        Post: isProfileOwner
+          ? { OR: [{ published: true }, { authorId: userId }] }
+          : { published: true },
+      },
+
+      orderBy: { created_at: "desc" },
+
+      include: { Post: { include: { author: true } }, author: true },
+    });
+
+    const count = await prisma.comment.count({
+      where: {
+        authorId: userId,
+        ...(isProfileOwner ? {} : { Post: { published: true } }),
+      },
+    });
+
+    return { comments, count };
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
 export async function createCommentDB(data) {
   try {
     const comment = await prisma.comment.create({
