@@ -72,14 +72,10 @@ export async function getUserPosts(req, res, next) {
   const cursor =
     req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
 
-  console.log({ userId, quantity, cursor, isAuthor });
-
   try {
     const posts = await getUserPostsDB(userId, quantity, cursor, isAuthor);
 
-    console.log(posts);
-
-    res.json({ success: true, posts });
+    res.json({ success: true, ...posts });
   } catch (error) {
     res.status(500).json({ success: false, error });
   }
