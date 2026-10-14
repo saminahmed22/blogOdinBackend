@@ -83,32 +83,28 @@ export async function createUser(req, res, next) {
 }
 
 export async function editUser(req, res, next) {
+  if (!req.user) {
+    return res.json({ success: false, error });
+  }
+
   const data = {
-    id: "019ffbc2-7319-71da-83f3-b271f6a40e7e",
-    firstName: req?.body?.firstName,
-    lastName: req?.body?.lastName,
-    username: req?.body?.username,
+    userId: req?.body?.userId,
     bio: req?.body?.bio,
-    passwordHash: req?.body?.passwordHash,
+    profilePictureLink: req?.body?.profilePictureLink,
   };
 
-  const user = await editUserDB(data);
+  const isProfileOwner = req.user.id === data.userId;
 
-  if (user instanceof Error) {
-    const errorCode = user.message;
+  if (!isProfileOwner) {
+    return res.json({ success: false });
+  }
 
-    let statusCode, errorMessage;
+  try {
+    const user = await editUserDB(data);
 
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
-
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
-  } else {
-    res.json(user);
+    res.json({ success: true, user });
+  } catch (error) {
+    res.json({ success: false, error });
   }
 }
 
