@@ -15,6 +15,8 @@ import {
   deleteUser,
 } from "../controllers/userController.js";
 
+import passport from "passport";
+
 userRouter.get("/:id", getUser);
 
 userRouter.post(
@@ -35,6 +37,6 @@ userRouter.post(
   createUser,
 );
 
-userRouter.put("/", editUser);
+userRouter.put("/", passport.authenticate("jwt", { session: false }), editUser);
 
 userRouter.delete("/:id", deleteUser);
