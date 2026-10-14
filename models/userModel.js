@@ -27,11 +27,12 @@ export async function createUserDB(data) {
 export async function editUserDB(data) {
   try {
     const user = await prisma.user.update({
-      data,
-      where: { id: data.id },
+      data: { bio: data.bio, profilePictureLink: data.profilePictureLink },
+
+      where: { id: data.userId },
     });
 
-    return { user };
+    return user;
   } catch (error) {
     const errorCode = error.code;
 
