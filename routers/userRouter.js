@@ -4,7 +4,6 @@ import { Router } from "express";
 export const userRouter = Router();
 
 // Validator
-
 import { validateRegisterForm } from "../validators/regFormValidator.js";
 
 // Controller
@@ -14,8 +13,6 @@ import {
   editUser,
   deleteUser,
 } from "../controllers/userController.js";
-
-import passport from "passport";
 
 userRouter.get("/:id", getUser);
 
@@ -37,6 +34,6 @@ userRouter.post(
   createUser,
 );
 
-userRouter.put("/", passport.authenticate("jwt", { session: false }), editUser);
+userRouter.put("/", editUser);
 
 userRouter.delete("/:id", deleteUser);

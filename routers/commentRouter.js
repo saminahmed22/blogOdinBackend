@@ -15,8 +15,6 @@ import {
   getUserComments,
 } from "../controllers/commentController.js";
 
-import passport from "passport";
-
 commentRouter.get("/", getComments);
 
 commentRouter.get("/user", getUserComments);
@@ -36,7 +34,6 @@ commentRouter.post(
 
     next();
   },
-  passport.authenticate("jwt", { session: false }),
   createComment,
 );
 
@@ -55,12 +52,7 @@ commentRouter.put(
 
     next();
   },
-  passport.authenticate("jwt", { session: false }),
   editComment,
 );
 
-commentRouter.delete(
-  "/",
-  passport.authenticate("jwt", { session: false }),
-  deleteComment,
-);
+commentRouter.delete("/", deleteComment);
