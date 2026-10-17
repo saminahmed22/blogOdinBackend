@@ -19,7 +19,7 @@ postRouter.get("/user", getUserPosts);
 
 postRouter.get("/search", findPosts);
 
-postRouter.get("/", getPost);
+postRouter.get("/:postId", getPost);
 
 postRouter.post("/", createPost);
 
