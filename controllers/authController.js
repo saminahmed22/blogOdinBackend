@@ -2,7 +2,6 @@ import { verifyPassword } from "../utils/verifyPassword.js";
 import { issueJWT } from "../utils/issueJwt.js";
 
 // User controller and models
-import { createUser } from "./userController.js";
 import { getUserDB } from "../models/userModel.js";
 
 export async function handleLoginRequest(req, res, next) {
