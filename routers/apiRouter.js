@@ -12,9 +12,9 @@ import passport from "passport";
 const passportCheck = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
     req.user = user;
-
-    next();
   });
+
+  next();
 };
 
 apiRouter.use("/auth", authRouter);
