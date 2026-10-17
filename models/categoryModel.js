@@ -2,11 +2,11 @@ import { prisma } from "../lib/prisma.js";
 
 export async function getCategoriesDB() {
   try {
-    const categories = await prisma.category.findMany({
+    const content = await prisma.category.findMany({
       select: { id: true, name: true },
     });
 
-    return categories;
+    return content;
   } catch (error) {
     const errorCode = error.code;
 
