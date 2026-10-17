@@ -1,13 +1,19 @@
 import { prisma } from "../lib/prisma.js";
 
-export async function getPostDB(postID) {
+export async function getPostDB({ userId = null, postId }) {
   try {
-    const post = await prisma.post.findUnique({
-      where: { id: postID, published: true },
+    const content = await prisma.post.findUnique({
+      where: {
+        id: postId,
+        ...(userId
+          ? { OR: [{ authorId: userId }, { published: true }] }
+          : { published: true }),
+      },
+
       include: { author: true, category: true },
     });
 
-    return post;
+    return content;
   } catch (error) {
     const errorCode = error.code;
 
@@ -15,25 +21,29 @@ export async function getPostDB(postID) {
   }
 }
 
-export async function getPostsDB(categoryId, quantity, cursor) {
+export async function getPostsDB({ userId, categoryId, quantity, cursor }) {
   try {
-    const posts = await prisma.post.findMany({
+    const content = await prisma.post.findMany({
       take: quantity,
       ...(cursor ? { cursor: { id: cursor } } : {}),
       skip: cursor ? 1 : 0,
 
-      where: { categoryId, published: true },
+      where: {
+        categoryId,
+
+        OR: [
+          ...(userId
+            ? [{ authorId: userId }, { published: true }]
+            : [{ published: true }]),
+        ],
+      },
 
       include: { author: true, category: true },
 
       orderBy: { created_at: "desc" },
     });
 
-    const count = await prisma.post.count({
-      where: { categoryId, published: true },
-    });
-
-    return { posts, count };
+    return content;
   } catch (error) {
     const errorCode = error.code;
 
@@ -41,27 +51,49 @@ export async function getPostsDB(categoryId, quantity, cursor) {
   }
 }
 
-export async function findPostsDB(searchQuery, quantity, cursor) {
+export async function findPostsDB({ searchQuery, userId, quantity, cursor }) {
   try {
-    const posts = await prisma.post.findMany({
+    const content = await prisma.post.findMany({
       take: quantity,
       ...(cursor ? { cursor: { id: cursor } } : {}),
       skip: cursor ? 1 : 0,
+
       where: {
-        OR: [
-          { title: { contains: searchQuery, mode: "insensitive" } },
-          { description: { contains: searchQuery, mode: "insensitive" } },
+        AND: [
           {
-            author: {
-              OR: [
-                { firstName: { contains: searchQuery, mode: "insensitive" } },
-                { lastName: { contains: searchQuery, mode: "insensitive" } },
-              ],
-            },
+            OR: [
+              { title: { contains: searchQuery, mode: "insensitive" } },
+              { description: { contains: searchQuery, mode: "insensitive" } },
+              {
+                author: {
+                  OR: [
+                    {
+                      firstName: {
+                        contains: searchQuery,
+                        mode: "insensitive",
+                      },
+                    },
+
+                    {
+                      lastName: {
+                        contains: searchQuery,
+                        mode: "insensitive",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+
+          {
+            OR: [
+              ...(userId
+                ? [{ authorId: userId }, { published: true }]
+                : [{ published: true }]),
+            ],
           },
         ],
-
-        published: true,
       },
 
       include: { author: true, category: true },
@@ -69,18 +101,7 @@ export async function findPostsDB(searchQuery, quantity, cursor) {
       orderBy: { created_at: "desc" },
     });
 
-    const count = await prisma.post.count({
-      where: {
-        OR: [
-          { title: { contains: searchQuery, mode: "insensitive" } },
-          { description: { contains: searchQuery, mode: "insensitive" } },
-        ],
-
-        published: true,
-      },
-    });
-
-    return { posts, count };
+    return content;
   } catch (error) {
     const errorCode = error.code;
 
@@ -88,24 +109,20 @@ export async function findPostsDB(searchQuery, quantity, cursor) {
   }
 }
 
-export async function getUserPostsDB(userId, quantity, cursor, isAuthor) {
+export async function getUserPostsDB({ authorId, isAuthor, quantity, cursor }) {
   try {
-    const posts = await prisma.post.findMany({
+    const content = await prisma.post.findMany({
       take: quantity,
       ...(cursor ? { cursor: { id: cursor } } : {}),
       skip: cursor ? 1 : 0,
 
-      where: { authorId: userId, ...(isAuthor ? {} : { published: true }) },
+      where: { authorId, ...(isAuthor ? {} : { published: true }) },
       orderBy: { created_at: "desc" },
 
       include: { author: true, category: true },
     });
 
-    const count = await prisma.post.count({
-      where: { authorId: userId, ...(isAuthor ? {} : { published: true }) },
-    });
-
-    return { posts, count };
+    return content;
   } catch (error) {
     const errorCode = error.code;
 
@@ -113,6 +130,7 @@ export async function getUserPostsDB(userId, quantity, cursor, isAuthor) {
   }
 }
 
+//
 export async function createPostDB(data) {
   try {
     const post = await prisma.post.create({ data });

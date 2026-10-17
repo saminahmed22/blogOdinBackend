@@ -8,6 +8,8 @@ import {
 } from "../models/commentModel.js";
 
 export async function getComments(req, res, next) {
+  const userId = req?.user?.id;
+
   const postId = req?.query?.postId;
 
   const quantity = Number(req?.query?.quantity) ?? 10;
@@ -16,21 +18,16 @@ export async function getComments(req, res, next) {
     req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
 
   try {
-    const comments = await getCommentsDB(postId, quantity, cursor);
+    const content = await getCommentsDB({ postId, userId, quantity, cursor });
 
-    res.json({ success: true, ...comments });
+    res.json({ content });
   } catch (error) {
-    res.json({ success: false, error });
+    res.json({ error });
   }
 }
 
 export async function getUserComments(req, res, next) {
-  const userId = req?.query?.userId;
-
-  const isProfileOwner = false;
-  if (req.user) {
-    isProfileOwner = req.user.id === userId;
-  }
+  const authorId = req?.query?.userId;
 
   const quantity = Number(req?.query?.quantity) ?? 10;
 
@@ -38,42 +35,48 @@ export async function getUserComments(req, res, next) {
     req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
 
   try {
-    const comments = await getUserCommentsDB(
-      userId,
+    const content = await getUserCommentsDB({
+      authorId,
       quantity,
       cursor,
-      isProfileOwner,
-    );
+    });
 
-    res.json({ success: true, ...comments });
+    res.json({ content });
   } catch (error) {
-    res.status(500).json({ success: false, error });
+    res.status(500).json({ error });
   }
 }
 
 export async function createComment(req, res, next) {
-  if (!req.user) {
-    return res.json({ success: false, error });
+  const authorId = req?.user?.id;
+
+  if (!authorId) {
+    return res.json({ success: false });
   }
 
   const data = {
+    authorId,
     content: req?.body?.comment,
     postId: req?.body?.postId,
-    authorId: req?.user?.id,
   };
 
   try {
-    const newComment = await createCommentDB(data);
+    const comment = await createCommentDB(data);
 
-    res.json({ success: true, comment: { ...newComment } });
+    res.json({ comment });
   } catch (error) {
     res.json({ success: false, error });
   }
 }
 
 export async function editComment(req, res, next) {
-  if (!req.user) {
-    return res.json({ success: false, error });
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    return res.json({
+      success: false,
+      error: "No user ID was found. Provide a JWT token.",
+    });
   }
 
   const data = {
@@ -81,7 +84,7 @@ export async function editComment(req, res, next) {
     postId: req?.body?.postId,
     content: req?.body?.comment,
     authorId: req?.body?.authorId,
-    requesterId: req?.user?.id,
+    requesterId: userId,
   };
 
   if (data.requesterId !== data.authorId) {
@@ -91,9 +94,9 @@ export async function editComment(req, res, next) {
   try {
     const comment = await editCommentDB(data);
 
-    res.json({ success: true, ...comment });
+    res.json({ comment });
   } catch (error) {
-    res.json({ success: false, error });
+    res.json({ error });
   }
 }
 

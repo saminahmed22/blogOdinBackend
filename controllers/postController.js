@@ -11,17 +11,21 @@ import {
 
 export async function getPost(req, res, next) {
   try {
-    const postID = req.params.id;
-    const post = await getPostDB(postID);
+    const userId = req?.user?.id;
+    const postId = req?.params?.postId;
 
-    res.json({ success: true, post: { ...post } });
+    const content = await getPostDB({ userId, postId });
+
+    res.json({ content });
   } catch (error) {
-    res.status(500).json({ success: false, error });
+    res.status(500).json({ error });
   }
 }
 
 export async function getPosts(req, res, next) {
   try {
+    const userId = req?.user?.id;
+
     const categoryId =
       req?.query?.categoryId === "undefined"
         ? undefined
@@ -32,11 +36,11 @@ export async function getPosts(req, res, next) {
     const cursor =
       req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
 
-    const posts = await getPostsDB(categoryId, quantity, cursor);
+    const content = await getPostsDB({ userId, categoryId, quantity, cursor });
 
-    res.json({ success: true, ...posts });
+    res.json({ content });
   } catch (error) {
-    res.status(500).json({ success: false, error });
+    res.status(500).json({ error });
   }
 }
 
@@ -46,25 +50,28 @@ export async function findPosts(req, res, next) {
 
     if (!query.length) return;
 
+    const userId = req?.user?.id;
+
     const quantity = Number(req?.query?.quantity) ?? 10;
 
     const cursor =
       req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
 
-    const posts = await findPostsDB(query, quantity, cursor);
+    const content = await findPostsDB({ query, userId, quantity, cursor });
 
-    res.json({ success: true, ...posts });
+    res.json({ content });
   } catch (error) {
     res.status(500).json({ success: false, error });
   }
 }
 
 export async function getUserPosts(req, res, next) {
-  const userId = req?.query?.userId;
+  const userId = req?.user?.id;
+  const authorId = req?.query?.userId;
 
   let isAuthor = false;
-  if (req.user) {
-    isAuthor = req.user.id === userId;
+  if (userId) {
+    isAuthor = authorId === userId;
   }
 
   const quantity = Number(req?.query?.quantity) ?? 10;
@@ -73,14 +80,20 @@ export async function getUserPosts(req, res, next) {
     req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
 
   try {
-    const posts = await getUserPostsDB(userId, quantity, cursor, isAuthor);
+    const content = await getUserPostsDB({
+      authorId,
+      isAuthor,
+      quantity,
+      cursor,
+    });
 
-    res.json({ success: true, ...posts });
+    res.json({ content });
   } catch (error) {
     res.status(500).json({ success: false, error });
   }
 }
 
+//
 export async function createPost(req, res, next) {
   const data = {
     title: req?.body?.title,

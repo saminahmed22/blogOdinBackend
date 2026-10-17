@@ -1,24 +1,26 @@
 import { prisma } from "../lib/prisma.js";
 
-export async function getCommentsDB(postId, quantity, cursor) {
+export async function getCommentsDB({ postId, userId, quantity, cursor }) {
   try {
-    const comments = await prisma.comment.findMany({
+    const content = await prisma.comment.findMany({
       take: quantity,
       ...(cursor ? { cursor: { id: cursor } } : {}),
       skip: cursor ? 1 : 0,
 
-      where: { postId },
+      where: {
+        postId,
+
+        Post: {
+          OR: [{ ...(userId ? { authorId: userId } : { published: true }) }],
+        },
+      },
 
       include: { author: true },
 
       orderBy: { created_at: "desc" },
     });
 
-    const count = await prisma.comment.count({
-      where: { postId: postId },
-    });
-
-    return { comments, count };
+    return content;
   } catch (error) {
     const errorCode = error.code;
 
@@ -26,23 +28,16 @@ export async function getCommentsDB(postId, quantity, cursor) {
   }
 }
 
-export async function getUserCommentsDB(
-  userId,
-  quantity,
-  cursor,
-  isProfileOwner,
-) {
+export async function getUserCommentsDB({ authorId, quantity, cursor }) {
   try {
-    const comments = await prisma.comment.findMany({
+    const content = await prisma.comment.findMany({
       take: quantity,
       ...(cursor ? { cursor: { id: cursor } } : {}),
       skip: cursor ? 1 : 0,
 
       where: {
-        authorId: userId,
-        Post: isProfileOwner
-          ? { OR: [{ published: true }, { authorId: userId }] }
-          : { published: true },
+        authorId,
+        Post: { published: true },
       },
 
       orderBy: { created_at: "desc" },
@@ -50,14 +45,7 @@ export async function getUserCommentsDB(
       include: { Post: { include: { author: true } }, author: true },
     });
 
-    const count = await prisma.comment.count({
-      where: {
-        authorId: userId,
-        ...(isProfileOwner ? {} : { Post: { published: true } }),
-      },
-    });
-
-    return { comments, count };
+    return content;
   } catch (error) {
     const errorCode = error.code;
 
@@ -87,7 +75,7 @@ export async function editCommentDB(data) {
       where: { id: data.id, postId: data.postId, authorId: data.requesterId },
     });
 
-    return { comment };
+    return comment;
   } catch (error) {
     const errorCode = error.code;
 
@@ -97,7 +85,7 @@ export async function editCommentDB(data) {
 
 export async function deleteCommentDB(data) {
   try {
-    const comment = await prisma.comment.delete({
+    await prisma.comment.delete({
       where: { id: data.id, authorId: data.authorId, postId: data.postId },
     });
 
