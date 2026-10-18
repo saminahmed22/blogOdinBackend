@@ -11,13 +11,15 @@ export async function getCommentsDB({ postId, userId, quantity, cursor }) {
         postId,
 
         Post: {
-          OR: [{ ...(userId ? { authorId: userId } : { published: true }) }],
+          ...(userId
+            ? { OR: [{ authorId: userId }, { published: true }] }
+            : { published: true }),
         },
       },
 
       include: { author: true },
 
-      orderBy: { created_at: "desc" },
+      orderBy: { id: "desc" },
     });
 
     return content;
@@ -40,7 +42,7 @@ export async function getUserCommentsDB({ authorId, quantity, cursor }) {
         Post: { published: true },
       },
 
-      orderBy: { created_at: "desc" },
+      orderBy: { id: "desc" },
 
       include: { Post: { include: { author: true } }, author: true },
     });
