@@ -40,7 +40,7 @@ export async function getPostsDB({ userId, categoryId, quantity, cursor }) {
 
       include: { author: true, category: true },
 
-      orderBy: { created_at: "desc" },
+      orderBy: { id: "desc" },
     });
 
     return content;
@@ -51,7 +51,12 @@ export async function getPostsDB({ userId, categoryId, quantity, cursor }) {
   }
 }
 
-export async function findPostsDB({ searchQuery, userId, quantity, cursor }) {
+export async function findPostsDB({
+  searchQuery = [],
+  userId,
+  quantity,
+  cursor,
+}) {
   try {
     const content = await prisma.post.findMany({
       take: quantity,
@@ -61,44 +66,33 @@ export async function findPostsDB({ searchQuery, userId, quantity, cursor }) {
       where: {
         AND: [
           {
-            OR: [
-              { title: { contains: searchQuery, mode: "insensitive" } },
-              { description: { contains: searchQuery, mode: "insensitive" } },
-              {
-                author: {
-                  OR: [
-                    {
-                      firstName: {
-                        contains: searchQuery,
-                        mode: "insensitive",
-                      },
-                    },
-
-                    {
-                      lastName: {
-                        contains: searchQuery,
-                        mode: "insensitive",
-                      },
-                    },
-                  ],
+            AND: searchQuery.map((query) => ({
+              OR: [
+                { title: { contains: query, mode: "insensitive" } },
+                { description: { contains: query, mode: "insensitive" } },
+                {
+                  author: {
+                    OR: [
+                      { firstName: { contains: query, mode: "insensitive" } },
+                      { lastName: { contains: query, mode: "insensitive" } },
+                    ],
+                  },
                 },
-              },
-            ],
+              ],
+            })),
           },
 
           {
-            OR: [
-              ...(userId
-                ? [{ authorId: userId }, { published: true }]
-                : [{ published: true }]),
-            ],
+            OR: userId
+              ? [{ authorId: userId }, { published: true }]
+              : [{ published: true }],
           },
         ],
       },
 
       include: { author: true, category: true },
 
-      orderBy: { created_at: "desc" },
+      orderBy: { id: "desc" },
     });
 
     return content;
@@ -117,7 +111,7 @@ export async function getUserPostsDB({ authorId, isAuthor, quantity, cursor }) {
       skip: cursor ? 1 : 0,
 
       where: { authorId, ...(isAuthor ? {} : { published: true }) },
-      orderBy: { created_at: "desc" },
+      orderBy: { id: "desc" },
 
       include: { author: true, category: true },
     });
@@ -137,6 +131,7 @@ export async function createPostDB(data) {
 
     return post;
   } catch (error) {
+    console.log(error);
     const errorCode = error.code;
 
     return new Error(errorCode);
