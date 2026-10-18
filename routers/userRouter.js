@@ -36,4 +36,4 @@ userRouter.post(
 
 userRouter.put("/", editUser);
 
-userRouter.delete("/:id", deleteUser);
+userRouter.delete("/", deleteUser);
