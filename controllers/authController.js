@@ -13,7 +13,6 @@ export async function handleLoginRequest(req, res, next) {
 
     if (!user) {
       return res.status(401).json({
-        success: false,
         message: "!credit",
       });
     }
@@ -22,7 +21,6 @@ export async function handleLoginRequest(req, res, next) {
 
     if (!isValid) {
       return res.status(401).json({
-        success: false,
         message: "!credit",
       });
     }
@@ -38,10 +36,10 @@ export async function handleLoginRequest(req, res, next) {
 
     delete user["passwordHash"];
 
-    const response = { success: true, user, jwt };
+    const response = { user, jwt };
 
     res.status(200).json(response);
   } catch (error) {
-    return res.status(500).json({ success: false, message: "error" });
+    return res.status(500).json({ message: "error" });
   }
 }
