@@ -11,10 +11,12 @@ import passport from "passport";
 
 const passportCheck = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
-    req.user = user;
-  });
+    if (user) {
+      req.user = user;
+    }
 
-  next();
+    next();
+  })(req, res, next);
 };
 
 apiRouter.use("/auth", authRouter);
