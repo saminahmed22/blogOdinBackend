@@ -46,9 +46,15 @@ export async function getPosts(req, res, next) {
 
 export async function findPosts(req, res, next) {
   try {
-    const query = req?.query?.query;
+    const searchQueryStr = req?.query?.query;
 
-    if (!query.length) return;
+    if (!searchQueryStr.length) return;
+
+    const searchQueryARR = req?.query?.query?.split(" ");
+
+    const searchQuery = searchQueryARR.filter((word) => word !== "");
+
+    console.log(searchQuery);
 
     const userId = req?.user?.id;
 
@@ -57,7 +63,12 @@ export async function findPosts(req, res, next) {
     const cursor =
       req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
 
-    const content = await findPostsDB({ query, userId, quantity, cursor });
+    const content = await findPostsDB({
+      searchQuery,
+      userId,
+      quantity,
+      cursor,
+    });
 
     res.json({ content });
   } catch (error) {
@@ -103,14 +114,12 @@ export async function createPost(req, res, next) {
     published: req?.body?.published === "true",
   };
 
-  const post = await createPostDB(data);
+  try {
+    const post = await createPostDB(data);
 
-  if (post instanceof Error) {
-    const errorCode = post.message;
-
-    res.json({ error: errorCode });
-  } else {
-    res.json(post);
+    res.json({ post });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
   }
 }
 
