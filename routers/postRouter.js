@@ -13,11 +13,14 @@ import {
   getUserPosts,
 } from "../controllers/postController.js";
 
+// Validators
+import { validateSearch } from "../validators/searchValidator.js";
+
 postRouter.get("/feed", getPosts);
 
 postRouter.get("/user", getUserPosts);
 
-postRouter.get("/search", findPosts);
+postRouter.get("/search", validateSearch, findPosts);
 
 postRouter.get("/:postId", getPost);
 
