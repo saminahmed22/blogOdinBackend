@@ -8,18 +8,38 @@ datasource db {
 }
 
 model User {
-  id                 String    @id @default(nanoid(15))
-  role               String    @default("general")
+  id                 String        @id @default(uuid(7))
+  role               String        @default("general")
   firstName          String
   lastName           String
-  username           String    @unique
+  username           String        @unique
   passwordHash       String
   profilePictureLink String?
   bio                String?
   posts              Post[]
   Comments           Comment[]
-  joined_at          DateTime  @default(now())
+  joined_at          DateTime      @default(now())
   theme_color        String
+  postVote           PostVote[]
+  commentVotes       CommentVote[]
+  bookmarks          Bookmark[]
+}
+
+model Post {
+  id          String     @id @default(uuid(7))
+  author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String
+  title       String
+  description String
+  published   Boolean    @default(true)
+  created_at  DateTime   @default(now())
+  edited_at   DateTime   @updatedAt
+  category    Category   @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  comments    Comment[]
+  totalVote   Int        @default(0)
+  postVotes   PostVote[]
+  bookmarks   Bookmark[]
 }
 
 model Category {
@@ -28,27 +48,46 @@ model Category {
   posts Post[]
 }
 
-model Post {
-  id          String    @id @default(nanoid(15))
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String
-  title       String
-  description String
-  published   Boolean   @default(true)
-  created_at  DateTime  @default(now())
-  edited_at   DateTime  @updatedAt
-  category    Category  @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  comments    Comment[]
+model PostVote {
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   String
+  vote     Int    @default(0)
+
+  @@unique(name: "vote_id", [authorId, postId])
+}
+
+model Bookmark {
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId   String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId     String
+  created_at DateTime @default(now())
+
+  @@unique(name: "vote_id", [authorId, postId])
+  @@index([authorId])
 }
 
 model Comment {
-  id         String   @id @default(nanoid(15))
-  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId   String
-  Post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId     String
-  created_at DateTime @default(now())
-  edited_at  DateTime @updatedAt
-  content    String
+  id           String        @id @default(uuid(7))
+  author       User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId     String
+  Post         Post?         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId       String
+  created_at   DateTime      @default(now())
+  edited_at    DateTime      @updatedAt
+  content      String
+  totalVote    Int           @default(0)
+  commentVotes CommentVote[]
+}
+
+model CommentVote {
+  author    User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String
+  vote      Int     @default(0)
+
+  @@unique(name: "vote_id", [authorId, commentId])
 }
