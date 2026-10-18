@@ -30,7 +30,8 @@ export async function createUser(req, res, next) {
   const hashedPassword = await hashString(givenPassword);
 
   const userColor = uniqolor.random({
-    lightness: 70,
+    lightness: [70, 90],
+    saturation: [30, 70],
   });
 
   const data = {
@@ -83,26 +84,20 @@ export async function createUser(req, res, next) {
 }
 
 export async function editUser(req, res, next) {
-  if (!req.user) {
-    return res.json({ success: false, error });
+  if (!req?.user) {
+    return res.status(401).json({ success: false, error: "Not authorized." });
   }
 
   const data = {
-    userId: req?.body?.userId,
+    userId: req?.user?.id,
     bio: req?.body?.bio,
     profilePictureLink: req?.body?.profilePictureLink,
   };
 
-  const isProfileOwner = req.user.id === data.userId;
-
-  if (!isProfileOwner) {
-    return res.json({ success: false });
-  }
-
   try {
     const user = await editUserDB(data);
 
-    res.json({ success: true, user });
+    res.json({ user });
   } catch (error) {
     res.json({ success: false, error });
   }
