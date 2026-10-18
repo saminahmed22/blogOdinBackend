@@ -15,6 +15,15 @@
           "clear",
           "node app.js --watch"
         ]
+      },
+      {
+        "name": "Prisma",
+        "autoExecuteCommands": true,
+        "icon": "database",
+        "color": "terminal.ansiMagenta",
+        "commands": [
+          "clear"
+        ]
       }
     ]
   }
