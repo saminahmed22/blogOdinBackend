@@ -9,8 +9,7 @@ import {
 // Utils
 import { hashString } from "../crypto/hash.js";
 import { issueJWT } from "../utils/issueJwt.js";
-
-import uniqolor from "uniqolor";
+import getRandomColor from "../utils/getRandomColors.js";
 
 export async function getUser(req, res, next) {
   const userID = req.params.id;
@@ -29,10 +28,7 @@ export async function createUser(req, res, next) {
 
   const hashedPassword = await hashString(givenPassword);
 
-  const userColor = uniqolor.random({
-    lightness: [70, 90],
-    saturation: [30, 70],
-  });
+  const userColor = getRandomColor();
 
   const data = {
     firstName: req?.body?.firstName,
@@ -40,7 +36,7 @@ export async function createUser(req, res, next) {
     username: req?.body?.username,
     bio: req?.body?.bio,
     passwordHash: hashedPassword,
-    theme_color: userColor.color,
+    theme_color: userColor,
   };
 
   const user = await createUserDB(data);
