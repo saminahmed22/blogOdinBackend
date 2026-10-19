@@ -11,6 +11,7 @@ import {
   editPost,
   deletePost,
   getUserPosts,
+  getUserDraftedPosts,
 } from "../controllers/postController.js";
 
 // Validators
@@ -19,6 +20,8 @@ import { validateSearch } from "../validators/searchValidator.js";
 postRouter.get("/feed", getPosts);
 
 postRouter.get("/user", getUserPosts);
+
+postRouter.get("/user/drafts", getUserDraftedPosts);
 
 postRouter.get("/search", validateSearch, findPosts);
 
