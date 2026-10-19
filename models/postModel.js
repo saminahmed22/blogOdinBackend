@@ -145,6 +145,26 @@ export async function getUserDraftedPostsDB({ userId, quantity, cursor }) {
   }
 }
 
+export async function toggleUserDraftedPostsDB({
+  toggleRequest,
+  userId,
+  postId,
+}) {
+  try {
+    const content = await prisma.post.update({
+      data: { published: toggleRequest },
+
+      where: { id: postId, authorId: userId },
+    });
+
+    return content;
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
 //
 export async function createPostDB(data) {
   try {
