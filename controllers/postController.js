@@ -7,6 +7,7 @@ import {
   editPostDB,
   deletePostDB,
   getUserPostsDB,
+  getUserDraftedPostsDB,
 } from "../models/postModel.js";
 
 export async function getPost(req, res, next) {
@@ -94,6 +95,31 @@ export async function getUserPosts(req, res, next) {
     const content = await getUserPostsDB({
       authorId,
       isAuthor,
+      quantity,
+      cursor,
+    });
+
+    res.json({ content });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+}
+
+export async function getUserDraftedPosts(req, res, next) {
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: "Not authorized." });
+  }
+
+  const quantity = Number(req?.query?.quantity) ?? 10;
+
+  const cursor =
+    req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
+
+  try {
+    const content = await getUserDraftedPostsDB({
+      userId,
       quantity,
       cursor,
     });
