@@ -12,6 +12,7 @@ import {
   deletePost,
   getUserPosts,
   getUserDraftedPosts,
+  toggleUserDraftedPosts,
 } from "../controllers/postController.js";
 
 // Validators
@@ -30,5 +31,7 @@ postRouter.get("/:postId", getPost);
 postRouter.post("/", createPost);
 
 postRouter.put("/", editPost);
+
+postRouter.put("/user/drafts", toggleUserDraftedPosts);
 
 postRouter.delete("/:id", deletePost);
