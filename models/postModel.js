@@ -124,6 +124,27 @@ export async function getUserPostsDB({ authorId, isAuthor, quantity, cursor }) {
   }
 }
 
+export async function getUserDraftedPostsDB({ userId, quantity, cursor }) {
+  try {
+    const content = await prisma.post.findMany({
+      take: quantity,
+      ...(cursor ? { cursor: { id: cursor } } : {}),
+      skip: cursor ? 1 : 0,
+
+      where: { authorId: userId, published: false },
+      orderBy: { id: "desc" },
+
+      include: { author: true, category: true },
+    });
+
+    return content;
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
 //
 export async function createPostDB(data) {
   try {
