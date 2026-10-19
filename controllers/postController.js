@@ -8,6 +8,7 @@ import {
   deletePostDB,
   getUserPostsDB,
   getUserDraftedPostsDB,
+  toggleUserDraftedPostsDB,
 } from "../models/postModel.js";
 
 export async function getPost(req, res, next) {
@@ -122,6 +123,29 @@ export async function getUserDraftedPosts(req, res, next) {
       userId,
       quantity,
       cursor,
+    });
+
+    res.json({ content });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+}
+
+export async function toggleUserDraftedPosts(req, res, next) {
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: "Not authorized." });
+  }
+
+  const postId = req?.body?.postId;
+  const toggleRequest = req?.body?.toggleRequest;
+
+  try {
+    const content = await toggleUserDraftedPostsDB({
+      toggleRequest,
+      userId,
+      postId,
     });
 
     res.json({ content });
