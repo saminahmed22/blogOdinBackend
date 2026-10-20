@@ -165,6 +165,53 @@ export async function toggleUserDraftedPostsDB({
   }
 }
 
+export async function setUserPostBookmarkDB({ userId, postId }) {
+  try {
+    const content = await prisma.bookmark.create({
+      data: { authorId: userId, postId },
+    });
+
+    return content;
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
+export async function deleteUserPostBookmarkDB({ userId, postId }) {
+  try {
+    const content = await prisma.bookmark.delete({
+      where: {
+        bookmark_id: {
+          postId,
+          authorId: userId,
+        },
+      },
+    });
+
+    return content;
+  } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
+// export async function getUserBookmarkedPosts({ userId }) {
+//   try {
+//     const content = await prisma.bookmark.findMany({
+//       where: { authorId: userId },
+//     });
+
+//     return content;
+//   } catch (error) {
+//     const errorCode = error.code;
+
+//     return new Error(errorCode);
+//   }
+// }
+
 //
 export async function createPostDB(data) {
   try {
@@ -172,7 +219,6 @@ export async function createPostDB(data) {
 
     return post;
   } catch (error) {
-    console.log(error);
     const errorCode = error.code;
 
     return new Error(errorCode);
