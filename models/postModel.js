@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 
+// Feed
 export async function getPostDB({ userId = null, postId }) {
   try {
     const content = await prisma.post.findUnique({
@@ -10,7 +11,17 @@ export async function getPostDB({ userId = null, postId }) {
           : { published: true }),
       },
 
-      include: { author: true, category: true },
+      include: {
+        author: true,
+        category: true,
+        ...(userId
+          ? {
+              _count: {
+                select: { bookmarks: { where: { authorId: userId, postId } } },
+              },
+            }
+          : {}),
+      },
     });
 
     return content;
@@ -38,13 +49,25 @@ export async function getPostsDB({ userId, categoryId, quantity, cursor }) {
         ],
       },
 
-      include: { author: true, category: true },
+      include: {
+        author: true,
+        category: true,
+        ...(userId
+          ? {
+              _count: {
+                select: { bookmarks: { where: { authorId: userId } } },
+              },
+            }
+          : {}),
+      },
 
       orderBy: { id: "desc" },
     });
 
     return content;
   } catch (error) {
+    console.log(error);
+
     const errorCode = error.code;
 
     return new Error(errorCode);
@@ -90,7 +113,17 @@ export async function findPostsDB({
         ],
       },
 
-      include: { author: true, category: true },
+      include: {
+        author: true,
+        category: true,
+        ...(userId
+          ? {
+              _count: {
+                select: { bookmarks: { where: { authorId: userId } } },
+              },
+            }
+          : {}),
+      },
 
       orderBy: { id: "desc" },
     });
@@ -103,7 +136,14 @@ export async function findPostsDB({
   }
 }
 
-export async function getUserPostsDB({ authorId, isAuthor, quantity, cursor }) {
+// User
+export async function getUserPostsDB({
+  authorId,
+  isAuthor,
+  quantity,
+  cursor,
+  userId,
+}) {
   try {
     const content = await prisma.post.findMany({
       take: quantity,
@@ -113,7 +153,17 @@ export async function getUserPostsDB({ authorId, isAuthor, quantity, cursor }) {
       where: { authorId, ...(isAuthor ? {} : { published: true }) },
       orderBy: { id: "desc" },
 
-      include: { author: true, category: true },
+      include: {
+        author: true,
+        category: true,
+        ...(userId
+          ? {
+              _count: {
+                select: { bookmarks: { where: { authorId: userId } } },
+              },
+            }
+          : {}),
+      },
     });
 
     return content;
@@ -124,6 +174,7 @@ export async function getUserPostsDB({ authorId, isAuthor, quantity, cursor }) {
   }
 }
 
+// Drafts
 export async function getUserDraftedPostsDB({ userId, quantity, cursor }) {
   try {
     const content = await prisma.post.findMany({
@@ -165,6 +216,7 @@ export async function toggleUserDraftedPostsDB({
   }
 }
 
+// Bookmark
 export async function setUserPostBookmarkDB({ userId, postId }) {
   try {
     const content = await prisma.bookmark.create({
