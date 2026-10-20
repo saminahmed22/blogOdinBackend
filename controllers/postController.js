@@ -98,6 +98,7 @@ export async function getUserPosts(req, res, next) {
       isAuthor,
       quantity,
       cursor,
+      userId,
     });
 
     res.json({ content });
