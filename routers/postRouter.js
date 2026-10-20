@@ -13,11 +13,14 @@ import {
   getUserPosts,
   getUserDraftedPosts,
   toggleUserDraftedPosts,
+  setUserPostBookmark,
+  deleteUserPostBookmark,
 } from "../controllers/postController.js";
 
 // Validators
 import { validateSearch } from "../validators/searchValidator.js";
 
+// GET
 postRouter.get("/feed", getPosts);
 
 postRouter.get("/user", getUserPosts);
@@ -28,10 +31,17 @@ postRouter.get("/search", validateSearch, findPosts);
 
 postRouter.get("/:postId", getPost);
 
+// POST
 postRouter.post("/", createPost);
 
+postRouter.post("/user/bookmark", setUserPostBookmark);
+
+// PUT
 postRouter.put("/", editPost);
 
 postRouter.put("/user/drafts", toggleUserDraftedPosts);
 
+// DELETE
 postRouter.delete("/:id", deletePost);
+
+postRouter.delete("/user/bookmark", deleteUserPostBookmark);
