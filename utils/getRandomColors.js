@@ -13,10 +13,13 @@ import uniqolor from "uniqolor";
 
 // Lightness should be around 88-92
 // Saturation should be around 60-100
-export default function getRandomColor() {
+export default function getRandomColor({
+  lightness = [88, 92],
+  saturation = [60, 100],
+}) {
   const randomColor = uniqolor.random({
-    lightness: [88, 92],
-    saturation: [60, 100],
+    lightness,
+    saturation,
   });
 
   return randomColor.color;
