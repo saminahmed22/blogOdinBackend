@@ -217,6 +217,33 @@ export async function toggleUserDraftedPostsDB({
 }
 
 // Bookmark
+export async function getUserBookmarksDB({ userId, quantity, cursor }) {
+  try {
+    const content = await prisma.bookmark.findMany({
+      take: quantity,
+      ...(cursor
+        ? { cursor: { bookmark_id: { authorId: userId, postId: cursor } } }
+        : {}),
+      skip: cursor ? 1 : 0,
+
+      where: { authorId: userId },
+
+      include: {
+        post: { include: { category: true, author: true } },
+      },
+
+      orderBy: { created_at: "desc" },
+    });
+
+    return content;
+  } catch (error) {
+    console.log(error);
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
 export async function setUserPostBookmarkDB({ userId, postId }) {
   try {
     const content = await prisma.bookmark.create({
