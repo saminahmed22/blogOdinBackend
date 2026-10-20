@@ -10,7 +10,7 @@ export async function getCommentsDB({ postId, userId, quantity, cursor }) {
       where: {
         postId,
 
-        Post: {
+        post: {
           ...(userId
             ? { OR: [{ authorId: userId }, { published: true }] }
             : { published: true }),
@@ -30,7 +30,12 @@ export async function getCommentsDB({ postId, userId, quantity, cursor }) {
   }
 }
 
-export async function getUserCommentsDB({ authorId, quantity, cursor }) {
+export async function getUserCommentsDB({
+  authorId,
+  userId,
+  quantity,
+  cursor,
+}) {
   try {
     const content = await prisma.comment.findMany({
       take: quantity,
@@ -39,12 +44,17 @@ export async function getUserCommentsDB({ authorId, quantity, cursor }) {
 
       where: {
         authorId,
-        Post: { published: true },
+
+        post: {
+          ...(userId
+            ? { OR: [{ authorId: userId }, { published: true }] }
+            : { published: true }),
+        },
       },
 
       orderBy: { id: "desc" },
 
-      include: { Post: { include: { author: true } }, author: true },
+      include: { post: { include: { author: true } }, author: true },
     });
 
     return content;
