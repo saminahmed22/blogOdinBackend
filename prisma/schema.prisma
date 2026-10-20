@@ -17,10 +17,10 @@ model User {
   profilePictureLink String?
   bio                String?
   posts              Post[]
-  Comments           Comment[]
+  comments           Comment[]
   joined_at          DateTime      @default(now())
   theme_color        String
-  postVote           PostVote[]
+  postVotes          PostVote[]
   commentVotes       CommentVote[]
   bookmarks          Bookmark[]
 }
@@ -46,6 +46,7 @@ model Category {
   id    Int    @id @default(autoincrement())
   name  String
   posts Post[]
+  color String
 }
 
 model PostVote {
@@ -55,7 +56,7 @@ model PostVote {
   postId   String
   vote     Int    @default(0)
 
-  @@unique(name: "vote_id", [authorId, postId])
+  @@id(name: "vote_id", [authorId, postId])
 }
 
 model Bookmark {
@@ -65,15 +66,14 @@ model Bookmark {
   postId     String
   created_at DateTime @default(now())
 
-  @@unique(name: "vote_id", [authorId, postId])
-  @@index([authorId])
+  @@id(name: "bookmark_id", [authorId, postId])
 }
 
 model Comment {
   id           String        @id @default(uuid(7))
   author       User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId     String
-  Post         Post?         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post         Post?         @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId       String
   created_at   DateTime      @default(now())
   edited_at    DateTime      @updatedAt
@@ -89,5 +89,5 @@ model CommentVote {
   commentId String
   vote      Int     @default(0)
 
-  @@unique(name: "vote_id", [authorId, commentId])
+  @@id(name: "vote_id", [authorId, commentId])
 }
