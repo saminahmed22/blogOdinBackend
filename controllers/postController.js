@@ -9,6 +9,8 @@ import {
   getUserPostsDB,
   getUserDraftedPostsDB,
   toggleUserDraftedPostsDB,
+  setUserPostBookmarkDB,
+  deleteUserPostBookmarkDB,
 } from "../models/postModel.js";
 
 export async function getPost(req, res, next) {
@@ -55,8 +57,6 @@ export async function findPosts(req, res, next) {
     const searchQueryARR = req?.query?.query?.split(" ");
 
     const searchQuery = searchQueryARR.filter((word) => word !== "");
-
-    console.log(searchQuery);
 
     const userId = req?.user?.id;
 
@@ -144,6 +144,48 @@ export async function toggleUserDraftedPosts(req, res, next) {
   try {
     const content = await toggleUserDraftedPostsDB({
       toggleRequest,
+      userId,
+      postId,
+    });
+
+    res.json({ content });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+}
+
+export async function setUserPostBookmark(req, res, next) {
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: "Not authorized." });
+  }
+
+  const postId = req?.body?.postId;
+
+  try {
+    const content = await setUserPostBookmarkDB({
+      userId,
+      postId,
+    });
+
+    res.json({ content });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+}
+
+export async function deleteUserPostBookmark(req, res, next) {
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: "Not authorized." });
+  }
+
+  const postId = req?.body?.postId;
+
+  try {
+    const content = await deleteUserPostBookmarkDB({
       userId,
       postId,
     });
