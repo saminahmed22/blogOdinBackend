@@ -27,6 +27,8 @@ export async function getComments(req, res, next) {
 }
 
 export async function getUserComments(req, res, next) {
+  const userId = req?.user?.id;
+
   const authorId = req?.query?.userId;
 
   const quantity = Number(req?.query?.quantity) ?? 10;
@@ -37,6 +39,7 @@ export async function getUserComments(req, res, next) {
   try {
     const content = await getUserCommentsDB({
       authorId,
+      userId,
       quantity,
       cursor,
     });
