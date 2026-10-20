@@ -13,6 +13,7 @@ import {
   getUserPosts,
   getUserDraftedPosts,
   toggleUserDraftedPosts,
+  getUserBookmarks,
   setUserPostBookmark,
   deleteUserPostBookmark,
 } from "../controllers/postController.js";
@@ -30,6 +31,8 @@ postRouter.get("/user/drafts", getUserDraftedPosts);
 postRouter.get("/search", validateSearch, findPosts);
 
 postRouter.get("/:postId", getPost);
+
+postRouter.get("/user/bookmark", getUserBookmarks);
 
 // POST
 postRouter.post("/", createPost);
