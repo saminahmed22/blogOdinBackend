@@ -16,6 +16,8 @@ import {
   getUserBookmarks,
   setUserPostBookmark,
   deleteUserPostBookmark,
+  createPostVote,
+  deletePostVote,
 } from "../controllers/postController.js";
 
 // Validators
@@ -39,6 +41,8 @@ postRouter.post("/", createPost);
 
 postRouter.post("/user/bookmark", setUserPostBookmark);
 
+postRouter.post("/user/vote", createPostVote);
+
 // PUT
 postRouter.put("/", editPost);
 
@@ -48,3 +52,5 @@ postRouter.put("/user/drafts", toggleUserDraftedPosts);
 postRouter.delete("/:id", deletePost);
 
 postRouter.delete("/user/bookmark", deleteUserPostBookmark);
+
+postRouter.delete("/user/vote", deletePostVote);
