@@ -347,23 +347,19 @@ export async function editPost(req, res, next) {
 }
 
 export async function deletePost(req, res, next) {
-  const postID = req.params.id;
-  const post = await deletePostDB(postID);
+  const userId = req?.user?.id;
 
-  if (post instanceof Error) {
-    const errorCode = post.message;
+  if (!userId) {
+    return res.status(401).json({ error: "Not authorized." });
+  }
 
-    let statusCode, errorMessage;
+  const postID = req?.body?.postId;
 
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
+  try {
+    await deletePostDB(postID, userId);
 
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
-  } else {
-    res.json(post);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
   }
 }
