@@ -49,7 +49,7 @@ postRouter.put("/", editPost);
 postRouter.put("/user/drafts", toggleUserDraftedPosts);
 
 // DELETE
-postRouter.delete("/:id", deletePost);
+postRouter.delete("/", deletePost);
 
 postRouter.delete("/user/bookmark", deleteUserPostBookmark);
 
