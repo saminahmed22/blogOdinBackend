@@ -116,7 +116,7 @@ export async function getUserDraftedPosts(req, res, next) {
   const userId = req?.user?.id;
 
   if (!userId) {
-    res.status(401).json({ error: "Not authorized." });
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const quantity = Number(req?.query?.quantity) ?? 10;
@@ -141,7 +141,7 @@ export async function toggleUserDraftedPosts(req, res, next) {
   const userId = req?.user?.id;
 
   if (!userId) {
-    res.status(401).json({ error: "Not authorized." });
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const postId = req?.body?.postId;
@@ -165,7 +165,7 @@ export async function getUserBookmarks(req, res, next) {
   const userId = req?.user?.id;
 
   if (!userId) {
-    res.status(401).json({ error: "Not authorized." });
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const quantity = Number(req?.query?.quantity) ?? 10;
@@ -206,7 +206,7 @@ export async function setUserPostBookmark(req, res, next) {
   const userId = req?.user?.id;
 
   if (!userId) {
-    res.status(401).json({ error: "Not authorized." });
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const postId = req?.body?.postId;
@@ -227,7 +227,7 @@ export async function deleteUserPostBookmark(req, res, next) {
   const userId = req?.user?.id;
 
   if (!userId) {
-    res.status(401).json({ error: "Not authorized." });
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const postId = req?.body?.postId;
@@ -249,7 +249,7 @@ export async function createPostVote(req, res, next) {
   const userId = req?.user?.id;
 
   if (!userId) {
-    res.status(401).json({ error: "Not authorized." });
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const postId = req?.body?.postId;
@@ -280,7 +280,7 @@ export async function deletePostVote(req, res, next) {
   const userId = req?.user?.id;
 
   if (!userId) {
-    res.status(401).json({ error: "Not authorized." });
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const postId = req?.body?.postId;
