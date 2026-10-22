@@ -12,8 +12,11 @@ import {
   getUserBookmarksDB,
   setUserPostBookmarkDB,
   deleteUserPostBookmarkDB,
+  createPostVoteDB,
+  deletePostVoteDB,
 } from "../models/postModel.js";
 
+// Gets
 export async function getPost(req, res, next) {
   try {
     const userId = req?.user?.id;
@@ -108,82 +111,7 @@ export async function getUserPosts(req, res, next) {
   }
 }
 
-export async function getUserBookmarks(req, res, next) {
-  const userId = req?.user?.id;
-
-  if (!userId) {
-    res.status(401).json({ error: "Not authorized." });
-  }
-
-  const quantity = Number(req?.query?.quantity) ?? 10;
-
-  const cursor =
-    req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
-
-  try {
-    const content = await getUserBookmarksDB({
-      userId,
-      quantity,
-      cursor,
-    });
-
-    /*
-
-{
-    id: '01a15907-6719-767c-83ba-4fa9e1d561e8',
-    authorId: '01a15902-30e0-73c9-87a5-6e786ea3dbea',
-    title: 'The Great Chocolate Chip Cookie Experiment',
-    description: 'Last month I baked six batches of chocolate chip cookies in one weekend, changing just one thing each time. I tried browned butter, a longer rest in the fridge, different sugar ratios, and a sprinkle of flaky salt on top.\n' +
-      '\n' +
-      'The winner was the batch with browned butter and a full day of chilled dough, which tasted deeply of caramel and toffee. My neighbors were thrilled to help with the testing, and I now have a recipe I will never change.\n' +
-      '\n',
-    published: true,
-    created_at: 2026-10-20T11:16:59.801Z,
-    edited_at: 2026-10-20T11:16:59.801Z,
-    categoryId: 17,
-    totalVote: 0,
-    author: {
-      id: '01a15902-30e0-73c9-87a5-6e786ea3dbea',
-      role: 'general',
-      firstName: 'Elena',
-      lastName: 'Marchetti',
-      username: 'elena',
-      profilePictureLink: null,
-      bio: 'Travel writer and amateur photographer chasing good light across Europe.',
-      joined_at: 2026-10-20T11:11:18.244Z,
-      theme_color: '#FFD6E0'
-    },
-    category: { id: 17, name: 'Cooking', color: '#f8b7aa' },
-    bookmarks: [ [Object] ],
-    _count: { bookmarks: 1 }
-  },
-
-*/
-
-    const refactoredContentArray = [];
-
-    for (const postObj of content) {
-      const newObj = { ...postObj.post };
-
-      newObj["author"] = postObj.post.author;
-
-      newObj["category"] = postObj.post.category;
-
-      // Adds _count property for CardActions
-      newObj["_count"] = { bookmarks: 1 };
-
-      // Assign newObjt to postObj
-      refactoredContentArray.push(newObj);
-    }
-
-    res.json({ content: refactoredContentArray });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({ success: false, error });
-  }
-}
-
+// Drafts
 export async function getUserDraftedPosts(req, res, next) {
   const userId = req?.user?.id;
 
@@ -232,6 +160,50 @@ export async function toggleUserDraftedPosts(req, res, next) {
   }
 }
 
+// Bookmark
+export async function getUserBookmarks(req, res, next) {
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: "Not authorized." });
+  }
+
+  const quantity = Number(req?.query?.quantity) ?? 10;
+
+  const cursor =
+    req?.query?.cursor === "undefined" ? undefined : req?.query?.cursor;
+
+  try {
+    const content = await getUserBookmarksDB({
+      userId,
+      quantity,
+      cursor,
+    });
+
+    const refactoredContentArray = [];
+
+    for (const postObj of content) {
+      const newObj = { ...postObj.post };
+
+      newObj["author"] = postObj.post.author;
+
+      newObj["category"] = postObj.post.category;
+
+      // Adds _count property for CardActions
+      newObj["_count"] = { bookmarks: 1 };
+
+      // Assign newObjt to postObj
+      refactoredContentArray.push(newObj);
+    }
+
+    res.json({ content: refactoredContentArray });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({ success: false, error });
+  }
+}
+
 export async function setUserPostBookmark(req, res, next) {
   const userId = req?.user?.id;
 
@@ -264,6 +236,59 @@ export async function deleteUserPostBookmark(req, res, next) {
 
   try {
     const content = await deleteUserPostBookmarkDB({
+      userId,
+      postId,
+    });
+
+    res.json({ content });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+}
+
+// Votes
+export async function createPostVote(req, res, next) {
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: "Not authorized." });
+  }
+
+  const postId = req?.body?.postId;
+
+  let givenVote = req?.body?.vote;
+
+  if (typeof givenVote !== "number") {
+    res.status(401).json({ error: "Not authorized." });
+  }
+
+  const vote =
+    givenVote < 1 ? (givenVote / givenVote) * -1 : givenVote / givenVote;
+
+  try {
+    const content = await createPostVoteDB({
+      userId,
+      postId,
+      vote,
+    });
+
+    res.json({ content });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+}
+
+export async function deletePostVote(req, res, next) {
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: "Not authorized." });
+  }
+
+  const postId = req?.body?.postId;
+
+  try {
+    const content = await deletePostVoteDB({
       userId,
       postId,
     });
