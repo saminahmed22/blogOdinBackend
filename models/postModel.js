@@ -1,31 +1,50 @@
 import { prisma } from "../lib/prisma.js";
 
+// Common objects
+
+const getIncObj = (userId = undefined) => {
+  return {
+    include: {
+      author: true,
+      category: true,
+
+      ...(userId
+        ? {
+            _count: {
+              select: {
+                bookmarks: { where: { authorId: userId } },
+              },
+            },
+
+            postVotes: {
+              where: { authorId: userId },
+              select: { vote: true },
+            },
+          }
+        : {}),
+    },
+  };
+};
+
 // Feed
 export async function getPostDB({ userId = null, postId }) {
   try {
     const content = await prisma.post.findUnique({
       where: {
         id: postId,
+
         ...(userId
           ? { OR: [{ authorId: userId }, { published: true }] }
           : { published: true }),
       },
 
-      include: {
-        author: true,
-        category: true,
-        ...(userId
-          ? {
-              _count: {
-                select: { bookmarks: { where: { authorId: userId, postId } } },
-              },
-            }
-          : {}),
-      },
+      ...getIncObj(userId),
     });
 
     return content;
   } catch (error) {
+    console.log(error);
+
     const errorCode = error.code;
 
     return new Error(errorCode);
@@ -49,17 +68,7 @@ export async function getPostsDB({ userId, categoryId, quantity, cursor }) {
         ],
       },
 
-      include: {
-        author: true,
-        category: true,
-        ...(userId
-          ? {
-              _count: {
-                select: { bookmarks: { where: { authorId: userId } } },
-              },
-            }
-          : {}),
-      },
+      ...getIncObj(userId),
 
       orderBy: { id: "desc" },
     });
@@ -113,17 +122,7 @@ export async function findPostsDB({
         ],
       },
 
-      include: {
-        author: true,
-        category: true,
-        ...(userId
-          ? {
-              _count: {
-                select: { bookmarks: { where: { authorId: userId } } },
-              },
-            }
-          : {}),
-      },
+      ...getIncObj(userId),
 
       orderBy: { id: "desc" },
     });
@@ -153,17 +152,7 @@ export async function getUserPostsDB({
       where: { authorId, ...(isAuthor ? {} : { published: true }) },
       orderBy: { id: "desc" },
 
-      include: {
-        author: true,
-        category: true,
-        ...(userId
-          ? {
-              _count: {
-                select: { bookmarks: { where: { authorId: userId } } },
-              },
-            }
-          : {}),
-      },
+      ...getIncObj(userId),
     });
 
     return content;
@@ -271,6 +260,103 @@ export async function deleteUserPostBookmarkDB({ userId, postId }) {
 
     return content;
   } catch (error) {
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
+// Vote
+export async function createPostVoteDB({ userId, postId, vote }) {
+  try {
+    const userVote = await prisma.postVote.findUnique({
+      where: {
+        vote_id: {
+          postId,
+          authorId: userId,
+        },
+      },
+
+      select: {
+        vote: true,
+      },
+    });
+
+    await prisma.post.update({
+      where: { id: postId },
+
+      data: {
+        totalVote: {
+          increment: userVote?.vote ? vote * 2 : vote,
+        },
+      },
+    });
+
+    await prisma.postVote.upsert({
+      create: { postId, authorId: userId, vote },
+      update: { postId, authorId: userId, vote },
+
+      where: {
+        vote_id: {
+          postId,
+          authorId: userId,
+        },
+      },
+    });
+
+    return true;
+  } catch (error) {
+    console.log("create err");
+    console.log(error);
+
+    const errorCode = error.code;
+
+    return new Error(errorCode);
+  }
+}
+
+export async function deletePostVoteDB({ userId, postId }) {
+  try {
+    const userVote = await prisma.postVote.findUnique({
+      where: {
+        vote_id: {
+          postId,
+          authorId: userId,
+        },
+      },
+
+      select: {
+        vote: true,
+      },
+    });
+
+    if (!userVote?.vote) return;
+
+    console.log(`Delete vote: ${userVote.vote}`);
+    await prisma.post.update({
+      where: { id: postId },
+
+      data: {
+        totalVote: {
+          decrement: userVote.vote,
+        },
+      },
+    });
+
+    await prisma.postVote.delete({
+      where: {
+        vote_id: {
+          postId,
+          authorId: userId,
+        },
+      },
+    });
+
+    return true;
+  } catch (error) {
+    console.log("delete err");
+    console.log(error);
+
     const errorCode = error.code;
 
     return new Error(errorCode);
