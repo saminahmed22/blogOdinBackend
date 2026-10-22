@@ -54,7 +54,7 @@ export async function createComment(req, res, next) {
   const authorId = req?.user?.id;
 
   if (!authorId) {
-    return res.json({ success: false });
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const data = {
@@ -76,10 +76,7 @@ export async function editComment(req, res, next) {
   const userId = req?.user?.id;
 
   if (!userId) {
-    return res.json({
-      success: false,
-      error: "No user ID was found. Provide a JWT token.",
-    });
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const data = {
@@ -104,8 +101,10 @@ export async function editComment(req, res, next) {
 }
 
 export async function deleteComment(req, res, next) {
-  if (!req.user) {
-    return res.json({ success: false });
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ error: "Not authorized." });
   }
 
   const data = {
