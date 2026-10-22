@@ -43,8 +43,6 @@ export async function getPostDB({ userId = null, postId }) {
 
     return content;
   } catch (error) {
-    console.log(error);
-
     const errorCode = error.code;
 
     return new Error(errorCode);
@@ -75,8 +73,6 @@ export async function getPostsDB({ userId, categoryId, quantity, cursor }) {
 
     return content;
   } catch (error) {
-    console.log(error);
-
     const errorCode = error.code;
 
     return new Error(errorCode);
@@ -226,7 +222,6 @@ export async function getUserBookmarksDB({ userId, quantity, cursor }) {
 
     return content;
   } catch (error) {
-    console.log(error);
     const errorCode = error.code;
 
     return new Error(errorCode);
@@ -306,9 +301,6 @@ export async function createPostVoteDB({ userId, postId, vote }) {
 
     return true;
   } catch (error) {
-    console.log("create err");
-    console.log(error);
-
     const errorCode = error.code;
 
     return new Error(errorCode);
@@ -332,7 +324,6 @@ export async function deletePostVoteDB({ userId, postId }) {
 
     if (!userVote?.vote) return;
 
-    console.log(`Delete vote: ${userVote.vote}`);
     await prisma.post.update({
       where: { id: postId },
 
@@ -354,9 +345,6 @@ export async function deletePostVoteDB({ userId, postId }) {
 
     return true;
   } catch (error) {
-    console.log("delete err");
-    console.log(error);
-
     const errorCode = error.code;
 
     return new Error(errorCode);

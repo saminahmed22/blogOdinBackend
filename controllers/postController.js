@@ -198,8 +198,6 @@ export async function getUserBookmarks(req, res, next) {
 
     res.json({ content: refactoredContentArray });
   } catch (error) {
-    console.log(error);
-
     res.status(500).json({ success: false, error });
   }
 }
