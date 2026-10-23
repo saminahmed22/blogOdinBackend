@@ -97,7 +97,7 @@ export async function findPostsDB({
             AND: searchQuery.map((query) => ({
               OR: [
                 { title: { contains: query, mode: "insensitive" } },
-                { description: { contains: query, mode: "insensitive" } },
+                { plain: { contains: query, mode: "insensitive" } },
                 {
                   author: {
                     OR: [
@@ -351,20 +351,6 @@ export async function deletePostVoteDB({ userId, postId }) {
   }
 }
 
-// export async function getUserBookmarkedPosts({ userId }) {
-//   try {
-//     const content = await prisma.bookmark.findMany({
-//       where: { authorId: userId },
-//     });
-
-//     return content;
-//   } catch (error) {
-//     const errorCode = error.code;
-
-//     return new Error(errorCode);
-//   }
-// }
-
 //
 export async function createPostDB(data) {
   try {
@@ -380,8 +366,9 @@ export async function createPostDB(data) {
 
 export async function editPostDB(data) {
   try {
-    const post = await prisma.post.update({
-      data,
+    const post = await prisma.post.upsert({
+      update: { ...data },
+      create: { ...data },
       where: { id: data.id, authorId: data.authorId },
     });
 
