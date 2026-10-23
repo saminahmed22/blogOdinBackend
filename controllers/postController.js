@@ -182,18 +182,20 @@ export async function getUserBookmarks(req, res, next) {
 
     const refactoredContentArray = [];
 
-    for (const postObj of content) {
-      const newObj = { ...postObj.post };
+    if (content.length >= 1) {
+      for (const postObj of content) {
+        const newObj = { ...postObj.post };
 
-      newObj["author"] = postObj.post.author;
+        newObj["author"] = postObj.post.author;
 
-      newObj["category"] = postObj.post.category;
+        newObj["category"] = postObj.post.category;
 
-      // Adds _count property for CardActions
-      newObj["_count"] = { bookmarks: 1 };
+        // Adds _count property for CardActions
+        newObj["_count"] = { bookmarks: 1 };
 
-      // Assign newObjt to postObj
-      refactoredContentArray.push(newObj);
+        // Assign newObjt to postObj
+        refactoredContentArray.push(newObj);
+      }
     }
 
     res.json({ content: refactoredContentArray });
