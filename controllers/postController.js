@@ -301,50 +301,53 @@ export async function deletePostVote(req, res, next) {
 
 //
 export async function createPost(req, res, next) {
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ error: "Not authorized." });
+  }
+
   const data = {
     title: req?.body?.title,
-    description: req?.body?.description,
-    authorId: req?.body?.authorId,
+    ops: req?.body?.ops,
+    plain: req?.body?.plain,
+    authorId: userId || req?.body?.authorId, //Remove body option
     categoryId: Number(req?.body?.categoryId),
-    published: req?.body?.published === "true",
+    published: req?.body?.published,
   };
 
   try {
-    const post = await createPostDB(data);
+    const content = await createPostDB(data);
 
-    res.json({ post });
+    res.json({ content });
   } catch (error) {
     res.status(500).json({ success: false, error });
   }
 }
 
 export async function editPost(req, res, next) {
+  const userId = req?.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ error: "Not authorized." });
+  }
+
   const data = {
     id: req?.body?.postId,
-    authorId: req?.body?.authorId,
+    authorId: userId,
     title: req?.body?.title,
-    description: req?.body?.description,
+    ops: req?.body?.ops,
+    plain: req?.body?.plain,
     categoryId: Number(req?.body?.categoryId),
     published: req?.body?.published === "true",
   };
 
-  const post = await editPostDB(data);
+  try {
+    const content = await editPostDB(data);
 
-  if (post instanceof Error) {
-    const errorCode = post.message;
-
-    let statusCode, errorMessage;
-
-    switch (errorCode) {
-      default:
-        statusCode = 500;
-        errorMessage = "Unknown error.";
-        break;
-    }
-
-    res.status(statusCode).json({ error: errorMessage, code: errorCode });
-  } else {
-    res.json(post);
+    res.json({ content });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
   }
 }
 
