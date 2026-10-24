@@ -317,7 +317,7 @@ export async function createPost(req, res, next) {
   };
 
   try {
-    const content = await createPostDB(data);
+    const content = await createPostDB(data, userId);
 
     res.json({ content });
   } catch (error) {
@@ -332,18 +332,20 @@ export async function editPost(req, res, next) {
     return res.status(401).json({ error: "Not authorized." });
   }
 
+  const postId = req?.body?.postId;
+
+  const timeStamp = new Date();
+
   const data = {
-    id: req?.body?.postId,
-    authorId: userId,
     title: req?.body?.title,
     ops: req?.body?.ops,
     plain: req?.body?.plain,
     categoryId: Number(req?.body?.categoryId),
-    published: req?.body?.published === "true",
+    published: req?.body?.published,
   };
 
   try {
-    const content = await editPostDB(data);
+    const content = await editPostDB({ data, postId, userId, timeStamp });
 
     res.json({ content });
   } catch (error) {
