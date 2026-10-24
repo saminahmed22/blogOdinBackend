@@ -351,32 +351,32 @@ export async function deletePostVoteDB({ userId, postId }) {
   }
 }
 
-//
-export async function createPostDB(data) {
+export async function createPostDB(data, userId) {
   try {
-    const post = await prisma.post.create({ data });
+    const post = await prisma.post.create({ data, ...getIncObj(userId) });
 
     return post;
   } catch (error) {
-    const errorCode = error.code;
-
-    return new Error(errorCode);
+    throw error;
   }
 }
 
-export async function editPostDB(data) {
+export async function editPostDB({ data, postId, userId, timeStamp }) {
   try {
     const post = await prisma.post.upsert({
-      update: { ...data },
-      create: { ...data },
-      where: { id: data.id, authorId: data.authorId },
+      where: { id: postId, authorId: userId },
+
+      create: { ...data, authorId: userId, created_at: timeStamp },
+      update: { ...data, edited_at: timeStamp },
+
+      ...getIncObj(userId),
     });
 
-    return { post };
+    return post;
   } catch (error) {
-    const errorCode = error.code;
+    console.log(error);
 
-    return new Error(errorCode);
+    throw error;
   }
 }
 
