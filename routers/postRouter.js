@@ -21,7 +21,9 @@ import {
 } from "../controllers/postController.js";
 
 // Validators
+import { validationResult } from "express-validator";
 import { validateSearch } from "../validators/searchValidator.js";
+import { validatePost } from "../validators/postValidator.js";
 
 // GET
 postRouter.get("/feed", getPosts);
@@ -37,14 +39,46 @@ postRouter.get("/:postId", getPost);
 postRouter.get("/user/bookmark", getUserBookmarks);
 
 // POST
-postRouter.post("/", createPost);
+postRouter.post(
+  "/",
+  validatePost,
+  (req, res, next) => {
+    const postValidationErrors = validationResult(req);
+
+    if (!postValidationErrors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        validationErrors: postValidationErrors.errors,
+      });
+    }
+
+    next();
+  },
+  createPost,
+);
 
 postRouter.post("/user/bookmark", setUserPostBookmark);
 
 postRouter.post("/user/vote", createPostVote);
 
 // PUT
-postRouter.put("/", editPost);
+postRouter.put(
+  "/",
+  validatePost,
+  (req, res, next) => {
+    const postValidationErrors = validationResult(req);
+
+    if (!postValidationErrors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        validationErrors: postValidationErrors.errors,
+      });
+    }
+
+    next();
+  },
+  editPost,
+);
 
 postRouter.put("/user/drafts", toggleUserDraftedPosts);
 
