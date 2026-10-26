@@ -4,7 +4,7 @@ import { prisma } from "../lib/prisma.js";
 async function addTotalCountToPostObj({ postId, postObj }) {
   const totalVotes = await getTotalVotes({ postId });
 
-  postObj["totalVotes"] = totalVotes || 0;
+  postObj["totalVote"] = totalVotes || 0;
 }
 
 // Common objects
@@ -349,7 +349,7 @@ export async function createPostDB(data, userId) {
   try {
     const post = await prisma.post.create({ data, ...getIncObj(userId) });
 
-    post["totalVotes"] = 0;
+    post["totalVote"] = 0;
 
     return post;
   } catch (error) {
