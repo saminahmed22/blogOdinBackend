@@ -1,7 +1,13 @@
 import { prisma } from "../lib/prisma.js";
 
-// Common objects
+// Helper
+async function addTotalCountToPostObj({ postId, postObj }) {
+  const totalVotes = await getTotalVotes({ postId });
 
+  postObj["totalVotes"] = totalVotes || 0;
+}
+
+// Common objects
 const getIncObj = (userId = undefined) => {
   return {
     include: {
@@ -41,6 +47,8 @@ export async function getPostDB({ userId = null, postId }) {
       ...getIncObj(userId),
     });
 
+    await addTotalCountToPostObj({ postId, postObj: content });
+
     return content;
   } catch (error) {
     throw error;
@@ -68,6 +76,11 @@ export async function getPostsDB({ userId, categoryId, quantity, cursor }) {
 
       orderBy: { id: "desc" },
     });
+
+    // Adds vote counts for each posts
+    for (const post of content) {
+      await addTotalCountToPostObj({ postId: post.id, postObj: post });
+    }
 
     return content;
   } catch (error) {
@@ -121,6 +134,11 @@ export async function findPostsDB({
       orderBy: { id: "desc" },
     });
 
+    // Adds vote counts for each posts
+    for (const post of content) {
+      await addTotalCountToPostObj({ postId: post.id, postObj: post });
+    }
+
     return content;
   } catch (error) {
     const errorCode = error.code;
@@ -149,6 +167,11 @@ export async function getUserPostsDB({
       ...getIncObj(userId),
     });
 
+    // Adds vote counts for each posts
+    for (const post of content) {
+      await addTotalCountToPostObj({ postId: post.id, postObj: post });
+    }
+
     return content;
   } catch (error) {
     const errorCode = error.code;
@@ -170,6 +193,11 @@ export async function getUserDraftedPostsDB({ userId, quantity, cursor }) {
 
       include: { author: true, category: true },
     });
+
+    // Adds vote counts for each posts
+    for (const post of content) {
+      await addTotalCountToPostObj({ postId: post.id, postObj: post });
+    }
 
     return content;
   } catch (error) {
@@ -218,6 +246,11 @@ export async function getUserBookmarksDB({ userId, quantity, cursor }) {
       orderBy: { created_at: "desc" },
     });
 
+    // Adds vote counts for each posts
+    for (const post of content) {
+      await addTotalCountToPostObj({ postId: post.id, postObj: post });
+    }
+
     return content;
   } catch (error) {
     const errorCode = error.code;
@@ -260,15 +293,15 @@ export async function deleteUserPostBookmarkDB({ userId, postId }) {
 }
 
 // Vote
-// export async function getTotalVotes({ postId }) {
-//   const totalVoteCount = await prisma.postVote.aggregate({
-//     where: { postId },
+export async function getTotalVotes({ postId }) {
+  const totalVoteCount = await prisma.postVote.aggregate({
+    where: { postId },
 
-//     _sum: { vote: true },
-//   });
+    _sum: { vote: true },
+  });
 
-//   return totalVoteCount._sum.vote;
-// }
+  return totalVoteCount._sum.vote;
+}
 
 export async function createPostVoteDB({ userId, postId, vote }) {
   try {
@@ -315,6 +348,8 @@ export async function deletePostVoteDB({ userId, postId }) {
 export async function createPostDB(data, userId) {
   try {
     const post = await prisma.post.create({ data, ...getIncObj(userId) });
+
+    post["totalVotes"] = 0;
 
     return post;
   } catch (error) {
