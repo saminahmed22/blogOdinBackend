@@ -43,9 +43,7 @@ export async function getPostDB({ userId = null, postId }) {
 
     return content;
   } catch (error) {
-    const errorCode = error.code;
-
-    return new Error(errorCode);
+    throw error;
   }
 }
 
@@ -262,31 +260,18 @@ export async function deleteUserPostBookmarkDB({ userId, postId }) {
 }
 
 // Vote
+// export async function getTotalVotes({ postId }) {
+//   const totalVoteCount = await prisma.postVote.aggregate({
+//     where: { postId },
+
+//     _sum: { vote: true },
+//   });
+
+//   return totalVoteCount._sum.vote;
+// }
+
 export async function createPostVoteDB({ userId, postId, vote }) {
   try {
-    const userVote = await prisma.postVote.findUnique({
-      where: {
-        vote_id: {
-          postId,
-          authorId: userId,
-        },
-      },
-
-      select: {
-        vote: true,
-      },
-    });
-
-    await prisma.post.update({
-      where: { id: postId },
-
-      data: {
-        totalVote: {
-          increment: userVote?.vote ? vote * 2 : vote,
-        },
-      },
-    });
-
     await prisma.postVote.upsert({
       create: { postId, authorId: userId, vote },
       update: { postId, authorId: userId, vote },
@@ -309,31 +294,6 @@ export async function createPostVoteDB({ userId, postId, vote }) {
 
 export async function deletePostVoteDB({ userId, postId }) {
   try {
-    const userVote = await prisma.postVote.findUnique({
-      where: {
-        vote_id: {
-          postId,
-          authorId: userId,
-        },
-      },
-
-      select: {
-        vote: true,
-      },
-    });
-
-    if (!userVote?.vote) return;
-
-    await prisma.post.update({
-      where: { id: postId },
-
-      data: {
-        totalVote: {
-          decrement: userVote.vote,
-        },
-      },
-    });
-
     await prisma.postVote.delete({
       where: {
         vote_id: {
@@ -351,6 +311,7 @@ export async function deletePostVoteDB({ userId, postId }) {
   }
 }
 
+// Actions
 export async function createPostDB(data, userId) {
   try {
     const post = await prisma.post.create({ data, ...getIncObj(userId) });
@@ -374,8 +335,6 @@ export async function editPostDB({ data, postId, userId, timeStamp }) {
 
     return post;
   } catch (error) {
-    console.log(error);
-
     throw error;
   }
 }
