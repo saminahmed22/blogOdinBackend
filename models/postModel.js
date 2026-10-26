@@ -248,7 +248,7 @@ export async function getUserBookmarksDB({ userId, quantity, cursor }) {
 
     // Adds vote counts for each posts
     for (const post of content) {
-      await addTotalCountToPostObj({ postId: post.id, postObj: post });
+      await addTotalCountToPostObj({ postId: post.id, postObj: post.post });
     }
 
     return content;
