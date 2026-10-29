@@ -1,8 +1,8 @@
 import { prisma } from "../lib/prisma.js";
 
 // Helper
-async function addTotalCountToPostObj({ postId, postObj }) {
-  if (postId || !postObj) return;
+async function addTotalCountToPostObj({ postId = null, postObj = null }) {
+  if (!postId || !postObj) return;
 
   const totalVotes = await getTotalVotes({ postId });
 
